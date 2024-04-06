@@ -5,22 +5,9 @@ import numpy as np
 import tensorflow as tf
 from flask_cors import CORS
 from pydantic import BaseModel
-import os
 
-
-# Define the directory where the models are stored
-models_directory = "../../models"
-
-# Get the absolute path of the models directory
-absolute_models_directory = os.path.abspath(models_directory)
-
-# Construct the absolute paths for scaler.pkl and base_data_model.h5
-scaler_path = os.path.join(absolute_models_directory, "scaler.pkl")
-model_path = os.path.join(absolute_models_directory, "base_data_model.h5")
-
-# Load the models
-minmax_scaler = joblib.load(scaler_path)
-base_model = tf.keras.models.load_model(model_path)
+minmax_scaler = joblib.load('../../models/scaler.pkl')
+base_model = tf.keras.models.load_model('../../models/base_data_model.h5')
 app = Flask(__name__)
 CORS(app)
 
