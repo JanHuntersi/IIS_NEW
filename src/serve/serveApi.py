@@ -7,7 +7,7 @@ from flask_cors import CORS
 from pydantic import BaseModel
 import os
 
-directory = "../../models/"
+directory = "../../"
 print("Contents of directory:", directory)
 print(os.listdir(directory))
 
