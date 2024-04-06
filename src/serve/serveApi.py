@@ -8,11 +8,17 @@ from pydantic import BaseModel
 import os
 
 
+# Define the directory where the models are stored
 models_directory = "../../models"
 
-scaler_path = os.path.join(models_directory, "scaler.pkl")
-model_path = os.path.join(models_directory, "base_data_model.h5")
+# Get the absolute path of the models directory
+absolute_models_directory = os.path.abspath(models_directory)
 
+# Construct the absolute paths for scaler.pkl and base_data_model.h5
+scaler_path = os.path.join(absolute_models_directory, "scaler.pkl")
+model_path = os.path.join(absolute_models_directory, "base_data_model.h5")
+
+# Load the models
 minmax_scaler = joblib.load(scaler_path)
 base_model = tf.keras.models.load_model(model_path)
 app = Flask(__name__)
