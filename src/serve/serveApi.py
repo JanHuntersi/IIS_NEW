@@ -5,9 +5,16 @@ import numpy as np
 import tensorflow as tf
 from flask_cors import CORS
 from pydantic import BaseModel
+import os
 
-minmax_scaler = joblib.load('../../models/scaler.pkl')
-base_model = tf.keras.models.load_model('../../models/base_data_model.h5')
+
+models_directory = "../../models"
+
+scaler_path = os.path.join(models_directory, "scaler.pkl")
+model_path = os.path.join(models_directory, "base_data_model.h5")
+
+minmax_scaler = joblib.load(scaler_path)
+base_model = tf.keras.models.load_model(model_path)
 app = Flask(__name__)
 CORS(app)
 
