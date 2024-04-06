@@ -1,13 +1,17 @@
 import pytest
 from serveApi import app
-
+from unittest.mock import patch
 
 @pytest.fixture
 def client():
     with app.test_client() as client:
         yield client
 
-def test_health(client):
+@patch("serveApi.joblib.load")
+def test_health(mock_load, client):
+    # Mocking the joblib.load function
+    mock_load.return_value = None  # or whatever value you expect
+
     # Test health endpoint
     response = client.get("/health")
     assert response.status_code == 200
