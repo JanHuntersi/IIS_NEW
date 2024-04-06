@@ -1,0 +1,29 @@
+name: Run basic tests on push
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --verbose pip
+        pip3 install --verbose poetry
+        poetry install
+
+    - name: Run tests
+      run: |
+        poetry run pytest
