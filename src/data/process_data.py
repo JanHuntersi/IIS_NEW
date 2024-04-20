@@ -1,39 +1,54 @@
 import pandas as pd
 import os
 
-def process_and_save_data(input_file, output_folder):
-    # Preberemo podatke iz CSV datoteke
-    data = pd.read_csv(input_file)
+CURR_DIR = os.path.dirname(os.path.abspath(__file__))
+INPUT_MBAJK_FILE = os.path.abspath(os.path.join(CURR_DIR, '..', '..', 'data', 'raw', 'fetch_mbajk.csv'))
+INPUT_WEATHER_FILE = os.path.abspath(os.path.join(CURR_DIR, '..', '..', 'data', 'raw', 'weather', 'weather.csv'))
+OUTPUT_FILE = os.path.abspath(os.path.join(CURR_DIR, '..', '..', 'data', 'processed'))
 
-    # Pretvorimo časovne žige v stolpcu "last_update" v časovni tip podatka
-    data['last_update'] = pd.to_datetime(data['last_update'], unit='ms')
-    
-    # Zaokrožimo časovne žige na urni interval
-    data['datetime'] = data['last_update'].dt.floor('H')
+def process_and_save_data(input_mbajk_file, input_weather_file, output_folder):
 
-    # Združimo podatke po postajališčih in urah
-    aggregated_data = data.groupby(['name', 'datetime']).agg({
+   # Load data for mbajk and weather
+    mbajk = pd.read_csv(input_mbajk_file)
+    weather = pd.read_csv(input_weather_file)
+
+    #Rename last_update to date
+    mbajk.rename(columns={'last_update':'date'}, inplace=True)
+
+    # Rename station_name to name
+    weather.rename(columns={'station_name':'number'}, inplace=True)
+
+    #Merge mbajk and weather data 
+    merged = pd.merge(mbajk, weather, on=['date','number'])
+
+    #Aggregate data 
+    aggregated_data = merged.groupby(['number','date']).agg({
         'available_bikes': 'mean',
-        'available_bike_stands': 'mean'
+        'available_bike_stands': 'mean',
+        'temperature_2m': 'mean',
+        'relative_humidity_2m': 'mean',
+        'dew_point_2m': 'mean',
+        'apparent_temperature': 'mean',
+        'precipitation_probability': 'mean',
+        'precipitation': 'mean',
+        'surface_pressure': 'mean'
     }).reset_index()
 
-    # Seznam vseh postajališč
-    postajalisca = aggregated_data['name'].unique()
 
-    for postajalisce in postajalisca:
+    # List of all stations
+    stations = aggregated_data['number'].unique()
+    
+    for station in stations:
         # Filtriramo podatke za trenutno postajališče
-        filtered_data = aggregated_data[aggregated_data['name'] == postajalisce]
+        filtered_data = aggregated_data[aggregated_data['number'] == station]
+        print(filtered_data.head())
         
         # Ime datoteke za shranjevanje podatkov
-        ime_datoteke = os.path.join(output_folder, f"{postajalisce.replace(' ', '_')}.csv")
+        station_path = os.path.join(output_folder, f"{station}.csv")
         
         # Shranimo filtrirane podatke v CSV datoteko
-        # z načinom 'w' za pisanje, da se podatki prepišejo
-        filtered_data.to_csv(ime_datoteke, mode='w', index=False)
+        filtered_data.to_csv(station_path, mode="a", header=not os.path.exists(station_path), index =False)
 
-        print(f"Podatki za postajališče {postajalisce} so bili uspešno prepisani v datoteko {ime_datoteke}")
+        print(f"Podatki za postajališče {station} so bili uspešno prepisani v datoteko {filtered_data}")
 
-# Uporaba funkcije
-input_file = '../data/raw/fetch_mbajk.csv'
-output_folder = '../data/processed'
-process_and_save_data(input_file, output_folder)
+process_and_save_data(INPUT_MBAJK_FILE,INPUT_WEATHER_FILE, OUTPUT_FILE)
