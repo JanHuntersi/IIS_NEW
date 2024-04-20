@@ -1,0 +1,55 @@
+name: Fetch and process data every hour
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  fetch_data:
+    runs-on: ubuntu-20.04
+
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.2
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          poetry --version
+
+      - name: Install dependencies
+        run: |
+          poetry install
+
+      - name: Run fetch_data.py
+        run: |
+          poetry run python src/data/fetch_data.py
+          if [ $? -eq 0 ]; then
+            echo "fetch_data.py executed successfully."
+          else
+            echo "Error executing fetch_data.py"
+            exit 1
+          fi
+
+          
+      - name: Push fetched data to GitHub
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Fetched data with GitHub actions
