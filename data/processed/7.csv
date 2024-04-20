@@ -1,0 +1,2 @@
+number,date,available_bikes,available_bike_stands,temperature_2m,relative_humidity_2m,dew_point_2m,apparent_temperature,precipitation_probability,precipitation,surface_pressure
+7,2024-04-20 16:00:00+00:00,20.0,0.0,11.815499,40.0,-1.3598288,7.0998535,95.0,0.0,979.37805

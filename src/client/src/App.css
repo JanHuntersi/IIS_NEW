@@ -1,0 +1,12 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+
+:root {
+  --primary-color: #e73439;
+}
+
+/* Rest of your CSS code */

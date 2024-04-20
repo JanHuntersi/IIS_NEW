@@ -18,3 +18,7 @@ Thumbs.db
 
 # Dependency directories
 .poetry/
+
+# Node modules
+node_modules/
+
