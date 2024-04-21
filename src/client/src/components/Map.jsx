@@ -1,11 +1,13 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import axios from "axios";
+import Station from "./Station";
 
 export default function Map() {
 	const mapRef = useRef(null);
-	const [stations, setStations] = React.useState([]);
+	const [stations, setStations] = useState([]);
+	const [selectedStation, setSelectedStation] = useState(null);
 
 	useEffect(() => {
 		// Check if map is already initialized
@@ -14,12 +16,17 @@ export default function Map() {
 			if (mapRef.current) {
 				response.data.forEach((station) => {
 					// Create a popup content with a link
-					const popupContent = `<b>${station.name}</b><br /><a href="${station.link}" target="_blank">Open Link</a>`;
+					const popupContent = `<b>${station.name}</b><br />`;
 
 					// Create marker with popup and add to map
-					L.marker([station.position.lat, station.position.lng])
+					const marker = L.marker([station.position.lat, station.position.lng])
 						.addTo(mapRef.current)
 						.bindPopup(popupContent);
+
+					// Add click event listener to the marker
+					marker.on("click", () => {
+						setSelectedStation(station);
+					});
 				});
 			}
 		});
@@ -34,5 +41,15 @@ export default function Map() {
 		}
 	}, []);
 
-	return <div id="map" style={{ height: "90%" }}></div>;
+	return (
+		<div style={{ display: "flex", height: "90%" }}>
+			<div id="map" style={{ flex: "1 1 auto", height: "100%" }}></div>
+			{selectedStation && (
+				<Station
+					station={selectedStation}
+					onClose={() => setSelectedStation(null)}
+				/>
+			)}
+		</div>
+	);
 }
