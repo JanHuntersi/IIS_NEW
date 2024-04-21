@@ -22,7 +22,6 @@ jobs:
           poetry install --no-root
       - name: Run tests
         run: |
-          cd src/serve
           poetry run pytest
 
       # Add more steps for your build process here
