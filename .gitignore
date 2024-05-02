@@ -22,3 +22,4 @@ Thumbs.db
 # Node modules
 node_modules/
 
+/data-file.bin
