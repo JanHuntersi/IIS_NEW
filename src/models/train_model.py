@@ -70,8 +70,6 @@ def train_lstm_model(model, X_train, y_train, epochs=50, station_name = "default
     history = model.fit(X_train, y_train, epochs=epochs, batch_size=32, validation_split=0.2, verbose=1)
     save_train_metrics(history, f"../../reports/{station_name}_train_metrics.txt")
     
-    #vis.plot_model_history(history)
-    #save_train_metrics(history, "./reports/"+station_name+"/train_metrics.txt")
 
 
 def train_model(data_path,station_name, window_size=16, test_size_multiplier=5, test=False):
@@ -160,19 +158,13 @@ def train_model(data_path,station_name, window_size=16, test_size_multiplier=5, 
 
 
 
-        #add visualiztation
-
-
     lstm_model_final = build_lstm_model(input_shape)
     train_lstm_model(lstm_model_final, X_final, y_final, epochs=30)
 
+
     lstm_model_final.save(f'../../models/{station_name}_model.h5')
-
-
-
     joblib.dump(stands_scaler, f'../../models/{station_name}_scaler.pkl')
     joblib.dump(other_scaler, f'../../models/{station_name}_other_scaler.pkl')
-    #joblib.dump(other_scaler, os.path.join(station_directory, 'other_scaler.joblib'))
 
 
 def main():

@@ -9,7 +9,7 @@ function Station({ station, onClose }) {
 		setIsLoading(true);
 		setPredictions([]);
 		const givenTime = new Date();
-		for (let i = 0; i < 8; i++) {
+		for (let i = 1; i < 9; i++) {
 			givenTime.setMinutes(Math.round(givenTime.getMinutes() / 60) * 60);
 			const roundedTime = givenTime.toLocaleTimeString("en-US", {
 				hour: "2-digit",

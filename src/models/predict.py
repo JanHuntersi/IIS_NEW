@@ -94,7 +94,7 @@ def predict(data, station_name = "test"):
     return prediction
 
 
-def only_predict(data, model, stands_scaler, other_scaler):
+def make_prediction(data, model, stands_scaler, other_scaler):
     selected_features = ['temperature',
         'apparent_temperature',
         'surface_pressure',
@@ -144,17 +144,17 @@ def predict_station(station_name,windowsize=24):
 
     #use og for now
     data = pd.read_csv(og_dataeset_dir)
+
     data['date'] = pd.to_datetime(data['date'])
     data = data.sort_values(by=['date'])
 
     #TODO REMOVE BECAUSE OF USING OG_DATASET
-    print("data", data.isna().sum())
     data = data.dropna()
 
 
     data = data.tail(windowsize)
 
-    print("data", data)
+   # print("data", data)
 
 #fix skewness
     left_skew_columns = ["surface_pressure"]
@@ -169,17 +169,16 @@ def predict_station(station_name,windowsize=24):
     latitude , longitude = get_lang_long_from_station(station_name)
     weather_data = weather_logic.get_forecast_data(latitude, longitude, station_name)
 
-    print("weather_data", weather_data)
+    #print("weather_data", weather_data)
 
     predctions = []
     for i in range(7):
 
-        prediction = only_predict(data.copy(), model, stands_scaler, other_scaler)
+        prediction = make_prediction(data.copy(), model, stands_scaler, other_scaler)
         predctions.append(float(prediction[0][0]))
 
         if(i == 6):
             break
-
 
         last_data = data.tail(1)
 

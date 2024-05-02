@@ -43,10 +43,6 @@ def prepare_train_data(data):
         
         data.loc[missing_data.index, column] = predictions
 
-    missing_values = data.isnull().sum()
-
-    #print(missing_values)
-
 
     #AGGREGATING DATA TO INTERVAL
 
@@ -58,7 +54,7 @@ def prepare_train_data(data):
 
     data = agg_data
     data.dropna(inplace=True)
-    #print(data.isnull().sum())
+
 
     left_skew_columns = ["surface_pressure"]
     for col in left_skew_columns:
