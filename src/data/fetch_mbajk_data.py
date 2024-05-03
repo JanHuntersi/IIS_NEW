@@ -8,7 +8,7 @@ URL = "https://api.jcdecaux.com/vls/v1/stations?contract=maribor&apiKey=5e150537
 # TODO update csv file name
 
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
-SAVE_MBAJK_DIR =  os.path.abspath(os.path.join(CURR_DIR, '..', '..', 'data', 'raw', 'test_fetch_mbajk.csv'))
+SAVE_MBAJK_DIR =  os.path.abspath(os.path.join(CURR_DIR, '..', '..', 'data', 'raw', 'fetch_mbajk.csv'))
 
 def fetch_data(api_url):
     try:

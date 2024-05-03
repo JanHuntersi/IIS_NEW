@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-#TODO update paths
+
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 INPUT_MBAJK_FILE = os.path.abspath(os.path.join(CURR_DIR, '..', '..', 'data', 'preprocessed', 'preprocessed_mbajk.csv'))
 INPUT_WEATHER_FILE = os.path.abspath(os.path.join(CURR_DIR, '..', '..', 'data', 'preprocessed', 'preprocessed_weather.csv'))
@@ -12,9 +12,8 @@ def merge_and_save_data(path_mbajk,path_weather, path_output):
     mbajk = pd.read_csv(path_mbajk)
     weather = pd.read_csv(path_weather)
 
-    # Read only last 29 rows
-    #mbajk = mbajk.tail(29)
-    #weather = weather.tail(29)
+    mbajk = mbajk.tail(29)
+    weather = weather.tail(29)
 
     #Merge mbajk and weather data
     merged = pd.merge(mbajk, weather, on=['date','number'])
