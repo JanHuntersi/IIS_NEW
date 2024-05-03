@@ -57,6 +57,9 @@ jobs:
     needs: test_the_apis
     runs-on: ubuntu-20.04
 
+    outputs:
+      sha_new: ${{ steps.sha_new.outputs.SHA_NEW }}
+
     permissions:
       contents: write
       
@@ -101,10 +104,6 @@ jobs:
         run: |
           poetry run dvc pull -r origin
       
-      - name: DVC Unprotect
-        run: |
-          poetry run dvc unprotect data
-      
       - name: Fetch bike data
         run: |
           poetry run python src/data/fetch_mbajk_data.py
@@ -126,17 +125,29 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "action: fetch bike data" 
+      
+      - name: Get commit SHA and store it in GITHUB_OUTPUT
+        id: sha_new
+        run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+
 
   process_bike_data:
     needs: fetch_bike_data
     runs-on: ubuntu-20.04
-
+    outputs:
+      sha_new: ${{ steps.sha_new.outputs.SHA_NEW }}
     permissions:
       contents: write
       
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        env:
+          SHA_NEW: ${{ needs.fetch_bike_data.outputs.sha_new }}
+        with:
+          ref: ${{ env.SHA_NEW }}
+          fetch-depth: 0
 
       - name: Cache dependencies
         uses: actions/cache@v2
@@ -174,9 +185,7 @@ jobs:
         run: |
           poetry run dvc pull -r origin
       
-      - name: DVC Unprotect
-        run: |
-          poetry run dvc unprotect data
+
       
       - name: Process bike data
         run: |
@@ -200,9 +209,15 @@ jobs:
         with:
           commit_message: "action: preprocess bike data" 
 
+      - name: Get commit SHA and store it in GITHUB_OUTPUT
+        id: sha_new
+        run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
   fetch_weather_data:
     needs: process_bike_data
     runs-on: ubuntu-20.04
+    outputs:
+      sha_new: ${{ steps.sha_new.outputs.SHA_NEW }}
 
     permissions:
       contents: write
@@ -210,6 +225,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        env:
+          SHA_NEW: ${{ needs.process_bike_data.outputs.sha_new }}
+        with:
+          ref: ${{ env.SHA_NEW }}
+          fetch-depth: 0
 
       - name: Cache dependencies
         uses: actions/cache@v2
@@ -247,9 +267,7 @@ jobs:
         run: |
           poetry run dvc pull -r origin
       
-      - name: DVC Unprotect
-        run: |
-          poetry run dvc unprotect data
+
       
       - name: Fetch weather data
         run: |
@@ -273,10 +291,17 @@ jobs:
         with:
           commit_message: "action: fetch_weather_data" 
 
+      - name: Get commit SHA and store it in GITHUB_OUTPUT
+        id: sha_new
+        run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
 
   process_weather_data:
     needs: fetch_weather_data
     runs-on: ubuntu-20.04
+    outputs:
+      sha_new: ${{ steps.sha_new.outputs.SHA_NEW }}
+
 
     permissions:
       contents: write
@@ -284,6 +309,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        env:
+          SHA_NEW: ${{ needs.fetch_weather_data.outputs.sha_new }}
+        with:
+          ref: ${{ env.SHA_NEW }}
+          fetch-depth: 0
 
       - name: Cache dependencies
         uses: actions/cache@v2
@@ -321,9 +351,7 @@ jobs:
         run: |
           poetry run dvc pull -r origin
       
-      - name: DVC Unprotect
-        run: |
-          poetry run dvc unprotect data
+
       
       - name: Preprocess weather
         run: |
@@ -347,10 +375,15 @@ jobs:
         with:
           commit_message: "action: preprocess weather data"
 
+      - name: Get commit SHA and store it in GITHUB_OUTPUT
+        id: sha_new
+        run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
     
   merge_data:
     needs: process_weather_data
     runs-on: ubuntu-20.04
+    outputs:
+      sha_new: ${{ steps.sha_new.outputs.SHA_NEW }}
 
     permissions:
       contents: write
@@ -358,6 +391,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        env:
+          SHA_NEW: ${{ needs.process_weather_data.outputs.sha_new }}
+        with:
+          ref: ${{ env.SHA_NEW }}
+          fetch-depth: 0
 
       - name: Cache dependencies
         uses: actions/cache@v2
@@ -394,10 +432,6 @@ jobs:
       - name: DVC Pull Data
         run: |
           poetry run dvc pull -r origin
-      
-      - name: DVC Unprotect
-        run: |
-          poetry run dvc unprotect data
       
       - name: Merge data
         run: |
