@@ -82,9 +82,11 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
           poetry --version
 
+      - run: poetry install --no-interaction --no-root
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
       - name: Install dependencies
         run: |
-          poetry install --with dev --no-interaction --no-root
+          poetry install
 
       - name: Install DVC
         uses: iterative/setup-dvc@v1
@@ -154,9 +156,10 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
           poetry --version
 
-      - name: Install dependencies
-        run: |
-          poetry install --with dev --no-interaction --no-root
+      - run: poetry install --no-interaction --no-root
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+
+      - run: poetry install --no-interaction
 
       - name: Install DVC
         uses: iterative/setup-dvc@v1
@@ -226,9 +229,10 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
           poetry --version
 
-      - name: Install dependencies
-        run: |
-          poetry install --with dev --no-interaction --no-root
+      - run: poetry install --no-interaction --no-root
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+
+      - run: poetry install --no-interaction
 
       - name: Install DVC
         uses: iterative/setup-dvc@v1
@@ -299,9 +303,10 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
           poetry --version
 
-      - name: Install dependencies
-        run: |
-          poetry install --with dev --no-interaction --no-root
+      - run: poetry install --no-interaction --no-root
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+
+      - run: poetry install --no-interaction
 
       - name: Install DVC
         uses: iterative/setup-dvc@v1
@@ -372,9 +377,10 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
           poetry --version
 
-      - name: Install dependencies
-        run: |
-          poetry install --with dev --no-interaction --no-root
+      - run: poetry install --no-interaction --no-root
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+
+      - run: poetry install --no-interaction
 
       - name: Install DVC
         uses: iterative/setup-dvc@v1
