@@ -1,5 +1,5 @@
-from test_mbajk_api import mbajk_api
-from test_weather_api import weather_api
+import test_mbajk_api as mbajk_api
+import test_weather_api as weather_api
 import pytest
 
 
