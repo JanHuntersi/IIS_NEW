@@ -49,8 +49,8 @@ jobs:
 
       - name: Test APIs
         run: |
-          poetry run python tests/mbajk_api_test.py
-          poetry run python tests/weather_api_test.py          
+          poetry run python tests/test_mbajk_api.py
+          poetry run python tests/test_weather_api.py          
 
 
   fetch_bike_data:
