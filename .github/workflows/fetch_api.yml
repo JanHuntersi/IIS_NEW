@@ -91,9 +91,9 @@ jobs:
       
       - name: Configure Dagshub
         run: |
-        peotry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
-        peotry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
-        peotry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
+          peotry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
+          peotry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
+          peotry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
 
       - name: DVC Pull Data
         run: |
@@ -117,7 +117,7 @@ jobs:
         run: |
           poetry run dvc add data
       
-      -name: DVC push
+      - name: DVC push
         run: |
           poetry run dvc push -r origin
       
@@ -163,9 +163,9 @@ jobs:
       
       - name: Configure Dagshub
         run: |
-        peotry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
-        peotry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
-        peotry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
+          peotry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
+          peotry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
+          peotry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
 
       - name: DVC Pull Data
         run: |
@@ -189,7 +189,7 @@ jobs:
         run: |
           poetry run dvc add data
       
-      -name: DVC push
+      - name: DVC push
         run: |
           poetry run dvc push -r origin
       
@@ -235,9 +235,9 @@ jobs:
       
       - name: Configure Dagshub
         run: |
-        peotry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
-        peotry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
-        peotry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
+          peotry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
+          peotry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
+          peotry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
 
       - name: DVC Pull Data
         run: |
@@ -261,7 +261,7 @@ jobs:
         run: |
           poetry run dvc add data
       
-      -name: DVC push
+      - name: DVC push
         run: |
           poetry run dvc push -r origin
       
@@ -308,9 +308,9 @@ jobs:
       
       - name: Configure Dagshub
         run: |
-        peotry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
-        peotry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
-        peotry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
+          peotry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
+          peotry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
+          peotry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
 
       - name: DVC Pull Data
         run: |
@@ -334,7 +334,7 @@ jobs:
         run: |
           poetry run dvc add data
       
-      -name: DVC push
+      - name: DVC push
         run: |
           poetry run dvc push -r origin
       
@@ -381,9 +381,9 @@ jobs:
       
       - name: Configure Dagshub
         run: |
-        peotry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
-        peotry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
-        peotry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
+          peotry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
+          peotry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
+          peotry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
 
       - name: DVC Pull Data
         run: |
@@ -407,7 +407,7 @@ jobs:
         run: |
           poetry run dvc add data
       
-      -name: DVC push
+      - name: DVC push
         run: |
           poetry run dvc push -r origin
       
