@@ -105,11 +105,11 @@ jobs:
       
       - name: Fetch bike data
         run: |
-          poetry run python src/data/fetch_bike_data.py
+          poetry run python src/data/fetch_mbajk_data.py
           if [ $? -eq 0 ]; then
-            echo "fetch_bike_data.py executed successfully."
+            echo "fetch_mbajk_data.py executed successfully."
           else
-            echo "Error executing fetch_bike_data.py"
+            echo "Error executing fetch_mbajk_data.py"
             exit 1
           fi
       
