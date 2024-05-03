@@ -125,6 +125,7 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "action: fetch bike data" 
+          branch: main
       
       - name: Get commit SHA and store it in GITHUB_OUTPUT
         id: sha_new
@@ -207,7 +208,9 @@ jobs:
       
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
+          branch: main
           commit_message: "action: preprocess bike data" 
+          
 
       - name: Get commit SHA and store it in GITHUB_OUTPUT
         id: sha_new
@@ -289,6 +292,7 @@ jobs:
       
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
+          branch: main
           commit_message: "action: fetch_weather_data" 
 
       - name: Get commit SHA and store it in GITHUB_OUTPUT
@@ -373,6 +377,7 @@ jobs:
       
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
+          branch: main
           commit_message: "action: preprocess weather data"
 
       - name: Get commit SHA and store it in GITHUB_OUTPUT
@@ -453,4 +458,5 @@ jobs:
       
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
+          branch: main
           commit_message: "action: merge data"
