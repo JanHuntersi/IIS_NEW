@@ -1,6 +1,4 @@
 import requests
-import test_mbajk_api as mbajk_api
-import test_weather_api as weather_api
 import pytest
 
 weater_api_url = "https://api.open-meteo.com/v1/forecast"
