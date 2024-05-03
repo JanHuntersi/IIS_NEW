@@ -24,6 +24,7 @@ requests-cache = "^1.2.0"
 retry-requests = "^2.0.0"
 numpy = "^1.26.4"
 dvc = "^3.50.1"
+dvc-s3 = "^3.2.0"
 
 
 [build-system]
