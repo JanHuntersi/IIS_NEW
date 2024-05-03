@@ -5,8 +5,56 @@ on:
     - cron: '0 * * * *'
   workflow_dispatch:
 
+env:
+  DVC_ACCESS_KEY_ID: ${{ secrets.DVC_ACCESS_KEY_ID }}
+  DVC_SECRET_ACCESS_KEY: ${{ secrets.DVC_SECRET_ACCESS_KEY }}
+
 jobs:
-  fetch_data:
+
+  test_the_apis:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout respository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.2
+
+      - name: cache poetry install
+        uses: actions/cache@v2
+        with:
+          path: ~/.local
+          key: poetry-1.8.2
+
+      - uses: snok/install-poetry@v1
+        with:
+          version: 1.8.2
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: cache deps
+        id: cache-deps
+        uses: actions/cache@v2
+        with:
+          path: .venv
+          key: pydeps-${{ hashFiles('**/poetry.lock') }}
+
+      - run: poetry install --no-interaction --no-root
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+
+      - run: poetry install --no-interaction
+
+      - name: Test APIs
+        run: |
+          poetry run python tests/mbajk_api_test.py
+          poetry run python tests/weather_api_test.py          
+
+
+  fetch_bike_data:
+    needs: test_the_apis
     runs-on: ubuntu-20.04
 
     permissions:
@@ -36,20 +84,333 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install
+          poetry install --with dev --no-interaction --no-root
 
-      - name: Run fetch_data.py
+      - name: Install DVC
+        uses: iterative/setup-dvc@v1
+      
+      - name: Configure Dagshub
         run: |
-          poetry run python src/data/fetch_data.py
+        peotry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
+        peotry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
+        peotry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
+
+      - name: DVC Pull Data
+        run: |
+          poetry run dvc pull -r origin
+      
+      - name: DVC Unprotect
+        run: |
+          poetry run dvc unprotect data
+      
+      - name: Fetch bike data
+        run: |
+          poetry run python src/data/fetch_bike_data.py
           if [ $? -eq 0 ]; then
-            echo "fetch_data.py executed successfully."
+            echo "fetch_bike_data.py executed successfully."
           else
-            echo "Error executing fetch_data.py"
+            echo "Error executing fetch_bike_data.py"
             exit 1
           fi
-
-          
-      - name: Push fetched data to GitHub
-        uses: stefanzweifel/git-auto-commit-action@v5
+      
+      - name: Add data to DVC
+        run: |
+          poetry run dvc add data
+      
+      -name: DVC push
+        run: |
+          poetry run dvc push -r origin
+      
+      - uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: Fetched data with GitHub actions
+          commit_message: "action: fetch bike data" 
+
+  process_bike_data:
+    needs: fetch_bike_data
+    runs-on: ubuntu-20.04
+
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.2
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          poetry --version
+
+      - name: Install dependencies
+        run: |
+          poetry install --with dev --no-interaction --no-root
+
+      - name: Install DVC
+        uses: iterative/setup-dvc@v1
+      
+      - name: Configure Dagshub
+        run: |
+        peotry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
+        peotry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
+        peotry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
+
+      - name: DVC Pull Data
+        run: |
+          poetry run dvc pull -r origin
+      
+      - name: DVC Unprotect
+        run: |
+          poetry run dvc unprotect data
+      
+      - name: Fetch bike data
+        run: |
+          poetry run python src/data/preprocesss_mbajk.py
+          if [ $? -eq 0 ]; then
+            echo "preprocesss_mbajk.py executed successfully."
+          else
+            echo "Error executing preprocesss_mbajk.py"
+            exit 1
+          fi
+      
+      - name: Add data to DVC
+        run: |
+          poetry run dvc add data
+      
+      -name: DVC push
+        run: |
+          poetry run dvc push -r origin
+      
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "action: preprocess bike data" 
+
+  fetch_weather_data:
+    needs: process_bike_data
+    runs-on: ubuntu-20.04
+
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.2
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          poetry --version
+
+      - name: Install dependencies
+        run: |
+          poetry install --with dev --no-interaction --no-root
+
+      - name: Install DVC
+        uses: iterative/setup-dvc@v1
+      
+      - name: Configure Dagshub
+        run: |
+        peotry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
+        peotry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
+        peotry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
+
+      - name: DVC Pull Data
+        run: |
+          poetry run dvc pull -r origin
+      
+      - name: DVC Unprotect
+        run: |
+          poetry run dvc unprotect data
+      
+      - name: Fetch bike data
+        run: |
+          poetry run python src/data/fetch_weather_data.py
+          if [ $? -eq 0 ]; then
+            echo "fetch_weather_data.py executed successfully."
+          else
+            echo "Error executing fetch_weather_data.py"
+            exit 1
+          fi
+      
+      - name: Add data to DVC
+        run: |
+          poetry run dvc add data
+      
+      -name: DVC push
+        run: |
+          poetry run dvc push -r origin
+      
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "action: fetch_weather_data" 
+
+
+  process_weather_data:
+    needs: fetch_weather_data
+    runs-on: ubuntu-20.04
+
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.2
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          poetry --version
+
+      - name: Install dependencies
+        run: |
+          poetry install --with dev --no-interaction --no-root
+
+      - name: Install DVC
+        uses: iterative/setup-dvc@v1
+      
+      - name: Configure Dagshub
+        run: |
+        peotry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
+        peotry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
+        peotry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
+
+      - name: DVC Pull Data
+        run: |
+          poetry run dvc pull -r origin
+      
+      - name: DVC Unprotect
+        run: |
+          poetry run dvc unprotect data
+      
+      - name: Fetch bike data
+        run: |
+          poetry run python src/data/preprocess_weather_data.py
+          if [ $? -eq 0 ]; then
+            echo "preprocess_weather_data.py executed successfully."
+          else
+            echo "Error executing preprocess_weather_data.py"
+            exit 1
+          fi
+      
+      - name: Add data to DVC
+        run: |
+          poetry run dvc add data
+      
+      -name: DVC push
+        run: |
+          poetry run dvc push -r origin
+      
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "action: preprocess weather data"
+
+    
+  merge_data:
+    needs: process_weather_data
+    runs-on: ubuntu-20.04
+
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.2
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          poetry --version
+
+      - name: Install dependencies
+        run: |
+          poetry install --with dev --no-interaction --no-root
+
+      - name: Install DVC
+        uses: iterative/setup-dvc@v1
+      
+      - name: Configure Dagshub
+        run: |
+        peotry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
+        peotry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
+        peotry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
+
+      - name: DVC Pull Data
+        run: |
+          poetry run dvc pull -r origin
+      
+      - name: DVC Unprotect
+        run: |
+          poetry run dvc unprotect data
+      
+      - name: Fetch bike data
+        run: |
+          poetry run python src/data/merge_data.py
+          if [ $? -eq 0 ]; then
+            echo "merge_data.py executed successfully."
+          else
+            echo "Error executing merge_data.py"
+            exit 1
+          fi
+      
+      - name: Add data to DVC
+        run: |
+          poetry run dvc add data
+      
+      -name: DVC push
+        run: |
+          poetry run dvc push -r origin
+      
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "action: merge data"
