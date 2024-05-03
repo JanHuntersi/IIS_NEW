@@ -178,13 +178,13 @@ jobs:
         run: |
           poetry run dvc unprotect data
       
-      - name: Fetch bike data
+      - name: Process bike data
         run: |
-          poetry run python src/data/preprocesss_mbajk.py
+          poetry run python src/data/preprocess_mbajk.py
           if [ $? -eq 0 ]; then
-            echo "preprocesss_mbajk.py executed successfully."
+            echo "preprocess_mbajk.py executed successfully."
           else
-            echo "Error executing preprocesss_mbajk.py"
+            echo "Error executing preprocess_mbajk.py"
             exit 1
           fi
       
@@ -251,7 +251,7 @@ jobs:
         run: |
           poetry run dvc unprotect data
       
-      - name: Fetch bike data
+      - name: Fetch weather data
         run: |
           poetry run python src/data/fetch_weather_data.py
           if [ $? -eq 0 ]; then
@@ -325,13 +325,13 @@ jobs:
         run: |
           poetry run dvc unprotect data
       
-      - name: Fetch bike data
+      - name: Preprocess weather
         run: |
-          poetry run python src/data/preprocess_weather_data.py
+          poetry run python src/data/preprocess_weather.py
           if [ $? -eq 0 ]; then
-            echo "preprocess_weather_data.py executed successfully."
+            echo "preprocess_weather.py executed successfully."
           else
-            echo "Error executing preprocess_weather_data.py"
+            echo "Error executing preprocess_weather.py"
             exit 1
           fi
       
@@ -399,7 +399,7 @@ jobs:
         run: |
           poetry run dvc unprotect data
       
-      - name: Fetch bike data
+      - name: Merge data
         run: |
           poetry run python src/data/merge_data.py
           if [ $? -eq 0 ]; then
