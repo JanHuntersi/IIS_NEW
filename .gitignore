@@ -27,3 +27,8 @@ node_modules/
 help.txt
 
 /data
+test.yml
+
+models/backup_models/
+
+/temporary_storage/

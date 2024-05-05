@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["jansernec <jan.sernec@gmail.com>"]
 readme = "README.md"
+packages = [{ include = "src" }]
 
 [tool.poetry.dependencies]
 tensorflow = "2.11.0"
@@ -25,8 +26,20 @@ retry-requests = "^2.0.0"
 numpy = "^1.26.4"
 dvc = "^3.50.1"
 dvc-s3 = "^3.2.0"
+great-expectations = "^0.18.13"
+evidently = "^0.4.20"
+mlflow = "^2.12.1"
+dagshub = "^0.3.26"
 
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.4.2"
+jupyter = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+train_all = "src.models.train_all_models:main"
