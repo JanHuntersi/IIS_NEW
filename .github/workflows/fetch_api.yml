@@ -597,6 +597,16 @@ jobs:
         run: |
           cp data/processed/1.csv data/current_data.csv
 
+      - name: Check length of reference data
+        run: |
+          poetry run python src/data/check_length.py
+          if [ $? -eq 0 ]; then
+            echo "check_length.py executed successfully."
+          else
+            echo "Error executing check_length.py"
+            exit 1
+          fi
+
       - name: Test data
         run: |
           poetry run python src/data/evidently_test.py
@@ -608,7 +618,7 @@ jobs:
           fi
       - name: Update reference data
         run: |
-          cp data/current_data data/reference_data.csv
+          cp data/current_data.csv data/reference_data.csv
       
       - name: Add data to DVC
         run: |
@@ -626,8 +636,6 @@ jobs:
       - name: Get commit SHA and store it in GITHUB_OUTPUT
         id: sha_new
         run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-
-        
 
   split_data:
     needs: test_data
