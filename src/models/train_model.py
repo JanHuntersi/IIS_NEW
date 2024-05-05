@@ -12,7 +12,10 @@ from sklearn.feature_selection import mutual_info_regression
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, GRU, Dense
 import matplotlib.pyplot as plt
-
+import mlflow
+import dagshub.auth
+import dagshub
+import src.environment_settings as settings
 import src.models.prepare_train_data as tm
 
 
@@ -57,6 +60,7 @@ def save_test_metrics(mae, mse, evs, file_path):
         file.write(f"MSE: {mse}\n")
         file.write(f"EVS: {evs}\n")
 
+
 def build_lstm_model(input_shape):
     model = Sequential()
     model.add(LSTM(units=32, return_sequences=True, input_shape=input_shape))
@@ -70,105 +74,87 @@ def train_lstm_model(model, X_train, y_train, epochs=50, station_name = "default
     history = model.fit(X_train, y_train, epochs=epochs, batch_size=32, validation_split=0.2, verbose=1)
     save_train_metrics(history, f"../../reports/{station_name}_train_metrics.txt")
     
+def train_model(data_path, station_name, window_size=16, test_size_multiplier=5, test=False):
+    dagshub.init(repo_owner='JanHuntersi', repo_name='IIS_NEW', mlflow=True)
+    print("starting run")
+    print("station_name: ",settings.mlflow_tracking_password)
 
-
-def train_model(data_path,station_name, window_size=16, test_size_multiplier=5, test=False):
-
-
-    data = pd.read_csv(data_path)
-
-    print("FOR STATION: ",station_name)
-
-    learn_features, data = tm.prepare_train_data(data)
-
-    train_size = len(learn_features) - window_size * test_size_multiplier
-    train_data, test_data = learn_features[:train_size], learn_features[train_size:]
-
-
-    print(train_data.shape, test_data.shape)
-
-    train_stands = np.array(train_data[:,0])
-    test_stands = np.array(test_data[:,0])
+    #dagshub.auth.add_app_token(token=settings.mlflow_tracking_password)
     
-    stands_scaler = MinMaxScaler()
-    train_stands_normalized = stands_scaler.fit_transform(train_stands.reshape(-1, 1))
-    test_stands_normalized = stands_scaler.transform(test_stands.reshape(-1, 1))
+    #mlflow.set_tracking_uri(settings.mlflow_tracking_password)
 
-    train_final_stands = np.array(learn_features[:, 0])
-    train_final_stands_normalized = stands_scaler.fit_transform(train_final_stands.reshape(-1, 1))
+    #mlflow.set_experiment("train_experiment")
+    #mlflow.set_tag("Training Info", "testing model")
+    #run_station_name=f"station_{station_name}_test"
 
-    train_other = np.array(train_data[:,1:])
-    test_other = np.array(test_data[:,1:])
-    other_scaler = MinMaxScaler()
-    train_other_normalized = other_scaler.fit_transform(train_other)
-    test_other_normalized = other_scaler.transform(test_other)
+    experiment_name = f"station_{station_name}_train_run"
+    mlflow.set_experiment(experiment_name)
 
-    train_final_other = np.array(learn_features[:, 1:])
-    train_final_other_normalized = other_scaler.fit_transform(train_final_other)
-
-
-    train_normalized = np.column_stack([train_stands_normalized, train_other_normalized])
-    test_normalized = np.column_stack([test_stands_normalized, test_other_normalized])
-
-    train_final_normalized = np.column_stack([train_final_stands_normalized, train_final_other_normalized])
+    mlflow.set_tracking_uri("https://dagshub.com/JanHuntersi/IIS_NEW.mlflow")
 
     
-    look_back = window_size
-    step = 1
 
-    X_train, y_train = create_dataset_with_steps(train_normalized, look_back, step)
-    X_test, y_test = create_dataset_with_steps(test_normalized, look_back, step)
-
-    X_final, y_final = create_dataset_with_steps(train_final_normalized, look_back, step)
-
-    X_train = X_train.reshape(X_train.shape[0], X_train.shape[2], X_train.shape[1])
-    X_test = X_test.reshape(X_test.shape[0], X_test.shape[2], X_test.shape[1])
-
-    X_final = X_final.reshape(X_final.shape[0], X_final.shape[2], X_final.shape[1])
+    with mlflow.start_run() as run:
+        mlflow.tensorflow.autolog()
 
 
-    print(f"X_train shape: {X_train.shape}")
-    print(f"X_test shape: {X_test.shape}")
-    
+        data = pd.read_csv(data_path)
 
-    input_shape = (X_train.shape[1], X_train.shape[2])
+        print("FOR STATION: ",station_name)
 
+        learn_features, data = tm.prepare_train_data(data)
 
-    if(test):
-        lstm_model_adv = build_lstm_model(input_shape)
-        train_lstm_model(lstm_model_adv, X_train, y_train, epochs=30)
+        train_size = len(learn_features)
+        print(learn_features.shape)
 
-
-
-
-        y_test_pred_lstm_adv = lstm_model_adv.predict(X_test)
-
-        y_test_true = stands_scaler.inverse_transform(y_test.reshape(-1, 1))
-
-        y_test_pred_lstm_adv = stands_scaler.inverse_transform(y_test_pred_lstm_adv)
-
+        train_stands = np.array(learn_features[:,0])
         
-        lstm_mae_test, lstm_mse_test, lstm_evs_test = calculate_metrics(y_test_true, y_test_pred_lstm_adv)
-        print("\nLSTM Model Metrics:")
-        print(f"MAE: {lstm_mae_test}, MSE: {lstm_mse_test}, EVS: {lstm_evs_test}")
+        stands_scaler = MinMaxScaler()
+        train_stands_normalized = stands_scaler.fit_transform(train_stands.reshape(-1, 1))
 
-        
-        with open(f'../../reports/{station_name}_metrics.txt', 'w', encoding='utf-8', errors='replace') as f:
-            f.write(f'Mean average error: {lstm_mae_test}\nMean square error: {lstm_mse_test}\nExplained variance score: {lstm_evs_test}\n')
+        train_final_stands = np.array(learn_features[:, 0])
+        train_final_stands_normalized = stands_scaler.fit_transform(train_final_stands.reshape(-1, 1))
+
+        train_other = np.array(learn_features[:,1:])
+        other_scaler = MinMaxScaler()
+        train_other_normalized = other_scaler.fit_transform(train_other)
+
+        train_final_other = np.array(learn_features[:, 1:])
+        train_final_other_normalized = other_scaler.fit_transform(train_final_other)
+
+        train_normalized = np.column_stack([train_stands_normalized, train_other_normalized])
+        train_final_normalized = np.column_stack([train_final_stands_normalized, train_final_other_normalized])
+
+        look_back = window_size
+        step = 1
+
+        X_train, y_train = create_dataset_with_steps(train_normalized, look_back, step)
+        X_final, y_final = create_dataset_with_steps(train_final_normalized, look_back, step)
+
+        X_train = X_train.reshape(X_train.shape[0], X_train.shape[2], X_train.shape[1])
+        X_final = X_final.reshape(X_final.shape[0], X_final.shape[2], X_final.shape[1])
+
+        print(f"X_train shape: {X_train.shape}")
+
+        input_shape = (X_train.shape[1], X_train.shape[2])
+
+        lstm_model_final = build_lstm_model(input_shape)
+        train_lstm_model(lstm_model_final, X_final, y_final, epochs=30)
+
+        mlflow.log_param("train_size", train_size)
 
 
-
-    lstm_model_final = build_lstm_model(input_shape)
-    train_lstm_model(lstm_model_final, X_final, y_final, epochs=30)
-
-
+    mlflow.end_run()
+    print("ending run")
     lstm_model_final.save(f'../../models/{station_name}_model.h5')
     joblib.dump(stands_scaler, f'../../models/{station_name}_scaler.pkl')
     joblib.dump(other_scaler, f'../../models/{station_name}_other_scaler.pkl')
 
 
+
 def main():
-    train_model("../../data/raw/og_dataset.csv","test",window_size=8,test=True)
+
+    train_model("../../data/raw/og_dataset.csv", "test", window_size=8, test=False)
 
 if __name__ == '__main__':
     main()

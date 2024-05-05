@@ -17,9 +17,12 @@ def prepare_train_data(data):
 
     data['date'] = pd.to_datetime(data['date'])
     data.sort_values(by='date', inplace=True)
-    features = ['available_bike_stands', 'temperature', 'relative_humidity',
-                'apparent_temperature', 'dew_point', 'precipitation_probability',
-                'surface_pressure','bike_stands', 'rain']
+
+    print("data features: ", data.columns)
+
+    features = ['available_bike_stands', 'temperature_2m', 'relative_humidity_2m',
+                'apparent_temperature', 'dew_point_2m', 'precipitation_probability',
+                'surface_pressure','available_bikes', 'precipitation']
     data = data[['date'] + features]
 
     data.isnull().sum()
@@ -43,6 +46,7 @@ def prepare_train_data(data):
         
         data.loc[missing_data.index, column] = predictions
 
+    print(data.isnull().sum())
 
     #AGGREGATING DATA TO INTERVAL
 
@@ -60,7 +64,7 @@ def prepare_train_data(data):
     for col in left_skew_columns:
         data[col] = np.square(data[col])
 
-    right_skew_columns = ["rain", "precipitation_probability"]
+    right_skew_columns = [ "precipitation_probability"]
     for col in right_skew_columns:
         data[col] = np.log(data[col]+1 )
 
@@ -77,12 +81,12 @@ def prepare_train_data(data):
 
     #selected_features = info_gains[info_gains > threshold].index.tolist()
 
-    selected_features = ['temperature',
+    selected_features = ['temperature_2m',
         'apparent_temperature',
         'surface_pressure',
-        'dew_point',
+        'dew_point_2m',
         'precipitation_probability',
-        'relative_humidity', "rain"]
+        'relative_humidity_2m', "precipitation"]
 
     learn_features = data[ ['available_bike_stands']+ list(selected_features)]
     learn_features = learn_features.values

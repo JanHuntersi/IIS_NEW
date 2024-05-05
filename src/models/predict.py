@@ -52,17 +52,14 @@ def predict(data, station_name = "test"):
     for col in left_skew_columns:
         data[col] = np.square(data[col])
 
-    right_skew_columns = ["precipitation_probability", "rain"]
+    right_skew_columns = ["precipitation_probability"]
     for col in right_skew_columns:
         data[col] = np.log(data[col]+1 )
 
 
-    selected_features = ['temperature',
-        'apparent_temperature',
-        'surface_pressure',
-        'dew_point',
-        'precipitation_probability',
-        'relative_humidity', "rain"]
+    selected_features = ['available_bike_stands', 'temperature_2m', 'relative_humidity_2m',
+                'apparent_temperature', 'dew_point_2m', 'precipitation_probability',
+                'surface_pressure','available_bikes', 'precipitation']
 
     learn_features = data[['available_bike_stands'] + list(selected_features) ]
     learn_features = learn_features.values
@@ -95,12 +92,12 @@ def predict(data, station_name = "test"):
 
 
 def make_prediction(data, model, stands_scaler, other_scaler):
-    selected_features = ['temperature',
+    selected_features = ['temperature_2m',
         'apparent_temperature',
         'surface_pressure',
-        'dew_point',
+        'dew_point_2m',
         'precipitation_probability',
-        'relative_humidity', "rain"]
+        'relative_humidity_2m', 'precipitation']
 
     learn_features = data[['available_bike_stands'] + list(selected_features) ]
     learn_features = learn_features.values
@@ -143,7 +140,7 @@ def predict_station(station_name,windowsize=24):
     processed_dataset_dir = os.path.join(current_dir, '..', '..', 'data', 'processed',f"{station_name}.csv")
 
     #use og for now
-    data = pd.read_csv(og_dataeset_dir)
+    data = pd.read_csv(processed_dataset_dir)
 
     data['date'] = pd.to_datetime(data['date'])
     data = data.sort_values(by=['date'])
@@ -161,7 +158,7 @@ def predict_station(station_name,windowsize=24):
     for col in left_skew_columns:
         data[col] = np.square(data[col])
 
-    right_skew_columns = ["precipitation_probability", "rain"]
+    right_skew_columns = ["precipitation_probability"]
     for col in right_skew_columns:
         data[col] = np.log(data[col]+1 )
 
@@ -183,14 +180,13 @@ def predict_station(station_name,windowsize=24):
         last_data = data.tail(1)
 
         station_data = {
-            "temperature": weather_data["temperature"][i], 
-            "relative_humidity": weather_data["relative_humidity"][i],
-            "dew_point": weather_data["dew_point"][i],
+            "temperature_2m": weather_data["temperature_2m"][i], 
+            "relative_humidity_2m": weather_data["relative_humidity_2m"][i],
+            "dew_point_2m": weather_data["dew_point_2m"][i],
             "apparent_temperature": weather_data["apparent_temperature"][i],
             "precipitation_probability":  np.log(weather_data["precipitation_probability"][i]+1 ),
-            "rain": np.log( weather_data["rain"][i]+1 ),
             "surface_pressure": np.square(weather_data["surface_pressure"][i]),
-            "bike_stands": last_data["bike_stands"].values[0],
+            "available_bikes": last_data["available_bikes"].values[0],
             "available_bike_stands": prediction[0][0]
         }
 
