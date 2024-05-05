@@ -51,11 +51,13 @@ def main():
     tests.run(reference_data=reference_data, current_data=current_data)
     test_results = tests.as_dict()
 
-    #print failed tests if any
+    print(test_results)
+
     if test_results['summary']['failed_tests']:
         print("Failed tests:")
-        for test in test_results['failed_tests']:
-            print(test)
+        print("---------------")
+        print(test_results)
+        
         sys.exit(1)
     else:
         print("All tests passed!")
