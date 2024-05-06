@@ -12,8 +12,8 @@ def merge_and_save_data(path_mbajk,path_weather, path_output):
     mbajk = pd.read_csv(path_mbajk)
     weather = pd.read_csv(path_weather)
 
-    mbajk = mbajk.tail(29)
-    weather = weather.tail(29)
+    #mbajk = mbajk.tail(29)
+    #weather = weather.tail(29)
 
     #Merge mbajk and weather data
     merged = pd.merge(mbajk, weather, on=['date','number'])
@@ -43,7 +43,7 @@ def merge_and_save_data(path_mbajk,path_weather, path_output):
         station_path = os.path.join(path_output, f"{station}.csv")
 
         #Save filtered data to CSV file
-        filtered_data.to_csv(station_path, mode='a', header=not os.path.exists(station_path), index=False)
+        filtered_data.to_csv(station_path, mode='w', header=True, index=False)
 
         print(f"Data for station {station} successfully saved to file {station_path}")
 
