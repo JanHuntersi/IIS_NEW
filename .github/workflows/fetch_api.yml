@@ -541,6 +541,10 @@ jobs:
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+      
+      - name: Get commit SHA and store it in GITHUB_OUTPUT
+        id: sha_new
+        run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
   test_data:
     needs: validate_data
@@ -554,7 +558,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        env:
+          SHA_NEW: ${{ needs.validate_data.outputs.sha_new }}
         with:
+          ref: ${{ needs.validate_data.outputs.sha_new }}
           fetch-depth: 0
         
       - name: Cache dependencies
@@ -588,6 +595,9 @@ jobs:
           poetry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
           poetry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
           poetry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
+
+      - name: Git Pull
+        run: git pull
 
       - name: DVC Pull Data
         run: |
@@ -628,6 +638,7 @@ jobs:
         run: |
           poetry run dvc push -r origin
 
+
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: main
@@ -640,6 +651,8 @@ jobs:
   split_data:
     needs: test_data
     runs-on: ubuntu-20.04
+    outputs:
+      sha_new: ${{ steps.sha_new.outputs.SHA_NEW }}
 
     permissions:
       contents: write
@@ -650,6 +663,7 @@ jobs:
         env:
           SHA_NEW: ${{ needs.test_data.outputs.sha_new }}
         with:
+          ref: ${{ needs.test_data.outputs.sha_new }}
           fetch-depth: 0
 
       - name: Cache dependencies
