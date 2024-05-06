@@ -1,7 +1,7 @@
 {
-  "id": "bb228bce-8a5c-4275-a416-fd8d32b932b6",
+  "id": "a77866d3-19e6-44ca-ad71-7eaec3807e2a",
   "name": null,
-  "timestamp": "2024-05-06T22:26:33.013585",
+  "timestamp": "2024-05-06T23:25:26.925092",
   "metadata": {
     "metric_presets": [
       "DataDriftPreset"
@@ -9227,20 +9227,28 @@
     },
     "data_definition": {
       "columns": {
-        "dew_point_2m": {
-          "column_name": "dew_point_2m",
+        "surface_pressure": {
+          "column_name": "surface_pressure",
           "column_type": "num"
         },
         "precipitation": {
           "column_name": "precipitation",
           "column_type": "num"
         },
-        "surface_pressure": {
-          "column_name": "surface_pressure",
-          "column_type": "num"
-        },
         "available_bikes": {
           "column_name": "available_bikes",
+          "column_type": "num"
+        },
+        "precipitation_probability": {
+          "column_name": "precipitation_probability",
+          "column_type": "num"
+        },
+        "temperature_2m": {
+          "column_name": "temperature_2m",
+          "column_type": "num"
+        },
+        "dew_point_2m": {
+          "column_name": "dew_point_2m",
           "column_type": "num"
         },
         "available_bike_stands": {
@@ -9251,24 +9259,16 @@
           "column_name": "apparent_temperature",
           "column_type": "num"
         },
-        "temperature_2m": {
-          "column_name": "temperature_2m",
-          "column_type": "num"
-        },
-        "precipitation_probability": {
-          "column_name": "precipitation_probability",
-          "column_type": "num"
-        },
         "relative_humidity_2m": {
           "column_name": "relative_humidity_2m",
           "column_type": "num"
         },
-        "number": {
-          "column_name": "number",
-          "column_type": "cat"
-        },
         "date": {
           "column_name": "date",
+          "column_type": "cat"
+        },
+        "number": {
+          "column_name": "number",
           "column_type": "cat"
         }
       },
