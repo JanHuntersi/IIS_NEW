@@ -599,7 +599,7 @@ jobs:
 
       - name: Check length of reference data
         run: |
-          poetry run python src/data/check_length.py
+          poetry run python src/models/check_length.py
           if [ $? -eq 0 ]; then
             echo "check_length.py executed successfully."
           else
