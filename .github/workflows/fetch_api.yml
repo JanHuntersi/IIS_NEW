@@ -589,15 +589,16 @@ jobs:
 
       - name: Install DVC
         uses: iterative/setup-dvc@v1
+
+      - name: Git Pull
+        run: |
+          git pull
       
       - name: Configure Dagshub
         run: |
           poetry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
           poetry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
           poetry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
-
-      - name: Git Pull
-        run: git pull
 
       - name: DVC Pull Data
         run: |
