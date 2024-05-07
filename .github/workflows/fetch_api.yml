@@ -13,6 +13,7 @@ jobs:
 
   test_the_apis:
     runs-on: ubuntu-20.04
+    timeout-minutes: 20
 
     steps:
       - name: Checkout respository
@@ -56,6 +57,7 @@ jobs:
   fetch_bike_data:
     needs: test_the_apis
     runs-on: ubuntu-20.04
+    timeout-minutes: 20
 
     outputs:
       sha_new: ${{ steps.sha_new.outputs.SHA_NEW }}
@@ -136,6 +138,7 @@ jobs:
   process_bike_data:
     needs: fetch_bike_data
     runs-on: ubuntu-20.04
+    timeout-minutes: 20
     outputs:
       sha_new: ${{ steps.sha_new.outputs.SHA_NEW }}
     permissions:
@@ -219,6 +222,7 @@ jobs:
   fetch_weather_data:
     needs: process_bike_data
     runs-on: ubuntu-20.04
+    timeout-minutes: 20
     outputs:
       sha_new: ${{ steps.sha_new.outputs.SHA_NEW }}
 
@@ -303,6 +307,7 @@ jobs:
   process_weather_data:
     needs: fetch_weather_data
     runs-on: ubuntu-20.04
+    timeout-minutes: 20
     outputs:
       sha_new: ${{ steps.sha_new.outputs.SHA_NEW }}
 
@@ -387,6 +392,7 @@ jobs:
   merge_data:
     needs: process_weather_data
     runs-on: ubuntu-20.04
+    timeout-minutes: 20
     outputs:
       sha_new: ${{ steps.sha_new.outputs.SHA_NEW }}
 
@@ -468,6 +474,7 @@ jobs:
   validate_data:
     needs: merge_data
     runs-on: ubuntu-20.04
+    timeout-minutes: 20
     outputs:
       sha_new: ${{ steps.sha_new.outputs.SHA_NEW }}
 
@@ -549,6 +556,7 @@ jobs:
   test_data:
     needs: validate_data
     runs-on: ubuntu-20.04
+    timeout-minutes: 20
     outputs:
       sha_new: ${{ steps.sha_new.outputs.SHA_NEW }}
 
@@ -648,6 +656,7 @@ jobs:
   split_data:
     needs: test_data
     runs-on: ubuntu-20.04
+    timeout-minutes: 20
     outputs:
       sha_new: ${{ steps.sha_new.outputs.SHA_NEW }}
 
