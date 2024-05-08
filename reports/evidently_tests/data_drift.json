@@ -1,7 +1,7 @@
 {
-  "id": "885409a0-dad5-445b-b981-c64cedfa2439",
+  "id": "26774999-c01f-4444-b7dd-4b47424993fa",
   "name": null,
-  "timestamp": "2024-05-08T22:25:04.793521",
+  "timestamp": "2024-05-08T23:27:54.486119",
   "metadata": {
     "metric_presets": [
       "DataDriftPreset"
@@ -73,7 +73,7 @@
             "column_type": "num",
             "stattest_name": "K-S p_value",
             "stattest_threshold": 0.05,
-            "drift_score": 1.0,
+            "drift_score": 0.9999999999999997,
             "drift_detected": false,
             "current": {
               "type": "evidently.calculations.data_drift.DriftStatsField",
@@ -148,7 +148,7 @@
                 "precipitation": -0.2466547637006637,
                 "precipitation_probability": -0.29007437105598277,
                 "relative_humidity_2m": -0.6100689639669427,
-                "surface_pressure": 0.1739937921220421,
+                "surface_pressure": 0.17399379212204213,
                 "temperature_2m": 0.9892367187189174
               }
             },
@@ -687,7 +687,7 @@
                     "146": 0.249426762017096,
                     "147": 0.31933154370418937,
                     "148": 0.5756822039363378,
-                    "149": 0.2162374297487215
+                    "149": 0.21623742974872126
                   }
                 }
               },
@@ -781,7 +781,7 @@
                 "precipitation": -0.09505536601930076,
                 "precipitation_probability": 0.08421346069302008,
                 "relative_humidity_2m": -0.21422510493659772,
-                "surface_pressure": -0.15311458540070544,
+                "surface_pressure": -0.15311458540070552,
                 "temperature_2m": 0.2981120171088554
               }
             },
@@ -1416,7 +1416,7 @@
                 "precipitation": 0.09505536601930076,
                 "precipitation_probability": -0.08421346069302008,
                 "relative_humidity_2m": 0.21422510493659772,
-                "surface_pressure": 0.15311458540070544,
+                "surface_pressure": 0.15311458540070552,
                 "temperature_2m": -0.2981120171088554
               }
             },
@@ -2053,7 +2053,7 @@
                 "precipitation": -0.061825656382597946,
                 "precipitation_probability": -0.020424463905096633,
                 "relative_humidity_2m": -0.004321610286793727,
-                "surface_pressure": 0.08082109889761654,
+                "surface_pressure": 0.0808210988976165,
                 "temperature_2m": 0.7143436817599429
               }
             },
@@ -3932,7 +3932,7 @@
                 "precipitation": 0.5583072948906016,
                 "precipitation_probability": 1.0,
                 "relative_humidity_2m": 0.3940433225698562,
-                "surface_pressure": -0.3603043499737065,
+                "surface_pressure": -0.36030434997370653,
                 "temperature_2m": -0.2875230808810066
               }
             },
@@ -4571,7 +4571,7 @@
                 "precipitation": 0.30093279343184526,
                 "precipitation_probability": 0.3940433225698562,
                 "relative_humidity_2m": 1.0,
-                "surface_pressure": -0.1388920952885765,
+                "surface_pressure": -0.1388920952885766,
                 "temperature_2m": -0.6961882636397414
               }
             },
@@ -5129,7 +5129,7 @@
             "column_type": "num",
             "stattest_name": "K-S p_value",
             "stattest_threshold": 0.05,
-            "drift_score": 1.0,
+            "drift_score": 0.9999999999999997,
             "drift_detected": false,
             "current": {
               "type": "evidently.calculations.data_drift.DriftStatsField",
@@ -5198,16 +5198,16 @@
                 ]
               },
               "correlations": {
-                "apparent_temperature": 0.1739937921220421,
-                "available_bike_stands": -0.15311458540070544,
-                "available_bikes": 0.15311458540070544,
-                "dew_point_2m": 0.08082109889761654,
+                "apparent_temperature": 0.17399379212204216,
+                "available_bike_stands": -0.15311458540070552,
+                "available_bikes": 0.15311458540070552,
+                "dew_point_2m": 0.08082109889761652,
                 "number": NaN,
                 "precipitation": -0.1066578809043718,
-                "precipitation_probability": -0.3603043499737065,
-                "relative_humidity_2m": -0.1388920952885765,
+                "precipitation_probability": -0.36030434997370653,
+                "relative_humidity_2m": -0.1388920952885766,
                 "surface_pressure": 1.0,
-                "temperature_2m": 0.15392985992166314
+                "temperature_2m": 0.15392985992166316
               }
             },
             "reference": {
@@ -5747,7 +5747,7 @@
                     "146": 0.08008425958540122,
                     "147": 0.2897299325232951,
                     "148": 0.2841545192907059,
-                    "149": 0.5448446476137226
+                    "149": 0.5448446476136548
                   }
                 }
               },
@@ -9563,12 +9563,16 @@
     },
     "data_definition": {
       "columns": {
+        "temperature_2m": {
+          "column_name": "temperature_2m",
+          "column_type": "num"
+        },
         "available_bikes": {
           "column_name": "available_bikes",
           "column_type": "num"
         },
-        "precipitation": {
-          "column_name": "precipitation",
+        "available_bike_stands": {
+          "column_name": "available_bike_stands",
           "column_type": "num"
         },
         "precipitation_probability": {
@@ -9583,20 +9587,16 @@
           "column_name": "apparent_temperature",
           "column_type": "num"
         },
+        "precipitation": {
+          "column_name": "precipitation",
+          "column_type": "num"
+        },
         "dew_point_2m": {
           "column_name": "dew_point_2m",
           "column_type": "num"
         },
-        "available_bike_stands": {
-          "column_name": "available_bike_stands",
-          "column_type": "num"
-        },
         "relative_humidity_2m": {
           "column_name": "relative_humidity_2m",
-          "column_type": "num"
-        },
-        "temperature_2m": {
-          "column_name": "temperature_2m",
           "column_type": "num"
         },
         "date": {
