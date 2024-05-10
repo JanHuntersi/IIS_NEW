@@ -1,7 +1,7 @@
 {
-  "id": "f1552cd4-d6fb-4f7a-8d60-a56e64c6a6e9",
+  "id": "b8f75b3d-02e8-4b78-9761-61764e4f8318",
   "name": null,
-  "timestamp": "2024-05-10T22:26:51.363987",
+  "timestamp": "2024-05-10T23:27:24.253699",
   "metadata": {
     "metric_presets": [
       "DataDriftPreset"
@@ -5772,7 +5772,7 @@
             "column_type": "num",
             "stattest_name": "K-S p_value",
             "stattest_threshold": 0.05,
-            "drift_score": 1.0,
+            "drift_score": 0.9999999999999998,
             "drift_detected": false,
             "current": {
               "type": "evidently.calculations.data_drift.DriftStatsField",
@@ -6382,7 +6382,7 @@
                     "146": 0.8351646544245014,
                     "147": 0.09999999999999876,
                     "148": 1.396722353702887,
-                    "149": 2.0702254305590326
+                    "149": 2.0702254305590313
                   }
                 }
               },
@@ -9907,6 +9907,14 @@
           "column_name": "available_bike_stands",
           "column_type": "num"
         },
+        "surface_pressure": {
+          "column_name": "surface_pressure",
+          "column_type": "num"
+        },
+        "relative_humidity_2m": {
+          "column_name": "relative_humidity_2m",
+          "column_type": "num"
+        },
         "available_bikes": {
           "column_name": "available_bikes",
           "column_type": "num"
@@ -9919,20 +9927,12 @@
           "column_name": "apparent_temperature",
           "column_type": "num"
         },
-        "surface_pressure": {
-          "column_name": "surface_pressure",
-          "column_type": "num"
-        },
-        "relative_humidity_2m": {
-          "column_name": "relative_humidity_2m",
+        "temperature_2m": {
+          "column_name": "temperature_2m",
           "column_type": "num"
         },
         "precipitation_probability": {
           "column_name": "precipitation_probability",
-          "column_type": "num"
-        },
-        "temperature_2m": {
-          "column_name": "temperature_2m",
           "column_type": "num"
         },
         "precipitation": {
