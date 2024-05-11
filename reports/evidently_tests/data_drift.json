@@ -1,7 +1,7 @@
 {
-  "id": "2bed49a6-1ff5-4eda-ba8b-96e58563a7e3",
+  "id": "ecaff9e6-5f8a-4a50-952b-67f92053edd3",
   "name": null,
-  "timestamp": "2024-05-11T22:25:23.358050",
+  "timestamp": "2024-05-11T23:26:12.641252",
   "metadata": {
     "metric_presets": [
       "DataDriftPreset"
@@ -1986,7 +1986,7 @@
             "column_type": "num",
             "stattest_name": "K-S p_value",
             "stattest_threshold": 0.05,
-            "drift_score": 1.0,
+            "drift_score": 0.9999999999999998,
             "drift_detected": false,
             "current": {
               "type": "evidently.calculations.data_drift.DriftStatsField",
@@ -2608,7 +2608,7 @@
                     "146": 2.5782692743867086,
                     "147": 0.5745694380095526,
                     "148": 1.317702882312535,
-                    "149": 0.1882097961915196
+                    "149": 0.18820979619151948
                   }
                 }
               },
@@ -10075,12 +10075,16 @@
     },
     "data_definition": {
       "columns": {
+        "precipitation_probability": {
+          "column_name": "precipitation_probability",
+          "column_type": "num"
+        },
         "available_bike_stands": {
           "column_name": "available_bike_stands",
           "column_type": "num"
         },
-        "apparent_temperature": {
-          "column_name": "apparent_temperature",
+        "surface_pressure": {
+          "column_name": "surface_pressure",
           "column_type": "num"
         },
         "dew_point_2m": {
@@ -10091,24 +10095,20 @@
           "column_name": "available_bikes",
           "column_type": "num"
         },
-        "relative_humidity_2m": {
-          "column_name": "relative_humidity_2m",
-          "column_type": "num"
-        },
         "temperature_2m": {
           "column_name": "temperature_2m",
           "column_type": "num"
         },
-        "surface_pressure": {
-          "column_name": "surface_pressure",
+        "relative_humidity_2m": {
+          "column_name": "relative_humidity_2m",
           "column_type": "num"
         },
         "precipitation": {
           "column_name": "precipitation",
           "column_type": "num"
         },
-        "precipitation_probability": {
-          "column_name": "precipitation_probability",
+        "apparent_temperature": {
+          "column_name": "apparent_temperature",
           "column_type": "num"
         },
         "date": {
