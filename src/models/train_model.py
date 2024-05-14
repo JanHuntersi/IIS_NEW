@@ -17,15 +17,11 @@ import dagshub.auth
 import dagshub
 import src.environment_settings as settings
 import src.models.prepare_train_data as tm
-
-
-def build_gru_model(input_shape):
-    model = Sequential()
-    model.add(GRU(units=32, return_sequences=True, input_shape=input_shape))
-    model.add(GRU(units=32))
-    model.add(Dense(units=16, activation='relu'))
-    model.add(Dense(units=1))
-    return model
+import onnxruntime as ort
+import tf2onnx
+from mlflow import MlflowClient
+import tensorflow as tf
+import src.models.mlflow_helper as mlfflow_helper
 
 def calculate_metrics(y_test, y_pred):
     mae = mean_absolute_error(y_test, y_pred)
@@ -60,7 +56,6 @@ def save_test_metrics(mae, mse, evs, file_path):
         file.write(f"MSE: {mse}\n")
         file.write(f"EVS: {evs}\n")
 
-
 def build_lstm_model(input_shape):
     model = Sequential()
     model.add(LSTM(units=32, return_sequences=True, input_shape=input_shape))
@@ -73,88 +68,157 @@ def train_lstm_model(model, X_train, y_train, epochs=50, station_name = "default
     model.compile(optimizer='adam', loss='mean_squared_error')
     history = model.fit(X_train, y_train, epochs=epochs, batch_size=32, validation_split=0.2, verbose=1)
     save_train_metrics(history, f"../../reports/{station_name}_train_metrics.txt")
+    return model
+
+def actually_train_model(data_path, station_name, window_size=16, test_size_multiplier=5, test=False,client=mlflow.MlflowClient()):
+    data = pd.read_csv(data_path)
+
+    print("FOR STATION: ",station_name)
+
+    learn_features, data, pipeline = tm.prepare_train_data(data)
+
+    mlfflow_helper.save_pipeline(client,pipeline,station_name)
+
+    train_size = len(learn_features)
+    print(learn_features.shape)
+
+    train_stands = np.array(learn_features[:,0])
+    
+    stands_scaler = MinMaxScaler()
+    train_stands_normalized = stands_scaler.fit_transform(train_stands.reshape(-1, 1))
+
+    train_final_stands = np.array(learn_features[:, 0])
+    train_final_stands_normalized = stands_scaler.fit_transform(train_final_stands.reshape(-1, 1))
+
+    train_other = np.array(learn_features[:,1:])
+    other_scaler = MinMaxScaler()
+    train_other_normalized = other_scaler.fit_transform(train_other)
+
+    train_final_other = np.array(learn_features[:, 1:])
+    train_final_other_normalized = other_scaler.fit_transform(train_final_other)
+
+    train_normalized = np.column_stack([train_stands_normalized, train_other_normalized])
+    train_final_normalized = np.column_stack([train_final_stands_normalized, train_final_other_normalized])
+
+    look_back = window_size
+    step = 1
+
+    X_train, y_train = create_dataset_with_steps(train_normalized, look_back, step)
+    X_final, y_final = create_dataset_with_steps(train_final_normalized, look_back, step)
+
+    X_train = X_train.reshape(X_train.shape[0], X_train.shape[2], X_train.shape[1])
+    X_final = X_final.reshape(X_final.shape[0], X_final.shape[2], X_final.shape[1])
+
+    print(f"X_train shape: {X_train.shape}")
+
+    input_shape = (X_train.shape[1], X_train.shape[2])
+
+    return input_shape, X_final, y_final, train_size, stands_scaler, other_scaler
+
+def save_scalar(mlf_flow_client,scaler, station_name, scalar_type):
+    metadata = {
+        "station_name": station_name,
+        "scaler_type": scalar_type,
+        "expected_features": scaler.n_features_in_,
+        "feature_range": scaler.feature_range,
+    }
+
+    scaler = mlflow.sklearn.log_model(
+        sk_model=scaler,
+        artifact_path=f"models/{station_name}/{scalar_type}",
+        registered_model_name=f"{scalar_type}={station_name}",
+        metadata=metadata,
+    )
+
+    scaler_version = mlf_flow_client.create_model_version(
+        name=f"{scalar_type}={station_name}",
+        source=scaler.model_uri,
+        run_id=scaler.run_id
+    )
+
+    mlf_flow_client.transition_model_version_stage(
+        name=f"{scalar_type}={station_name}",
+        version=scaler_version.version,
+        stage="staging",
+    )
     
 def train_model(data_path, station_name, window_size=16, test_size_multiplier=5, test=False):
+   
     dagshub.init(repo_owner='JanHuntersi', repo_name='IIS_NEW', mlflow=True)
+   
     print("starting run")
     print("station_name: ",settings.mlflow_tracking_password)
 
-    #dagshub.auth.add_app_token(token=settings.mlflow_tracking_password)
-    
-    #mlflow.set_tracking_uri(settings.mlflow_tracking_password)
+    ml_flow_client = MlflowClient()
 
-    #mlflow.set_experiment("train_experiment")
-    #mlflow.set_tag("Training Info", "testing model")
-    #run_station_name=f"station_{station_name}_test"
-
-    experiment_name = f"station_{station_name}_train_run"
+    experiment_name = f"station_{station_name}_train"
     mlflow.set_experiment(experiment_name)
 
     mlflow.set_tracking_uri("https://dagshub.com/JanHuntersi/IIS_NEW.mlflow")
 
     
 
-    with mlflow.start_run() as run:
+    with mlflow.start_run(run_name=f"run={station_name}_train") as run:
+        print("starting autolog")
         mlflow.tensorflow.autolog()
 
 
-        data = pd.read_csv(data_path)
-
-        print("FOR STATION: ",station_name)
-
-        learn_features, data = tm.prepare_train_data(data)
-
-        train_size = len(learn_features)
-        print(learn_features.shape)
-
-        train_stands = np.array(learn_features[:,0])
+        input_shape, X_final, y_final, train_size, stands_scalar, other_scarlar = actually_train_model(data_path, station_name, window_size, test_size_multiplier, test, ml_flow_client)
         
-        stands_scaler = MinMaxScaler()
-        train_stands_normalized = stands_scaler.fit_transform(train_stands.reshape(-1, 1))
-
-        train_final_stands = np.array(learn_features[:, 0])
-        train_final_stands_normalized = stands_scaler.fit_transform(train_final_stands.reshape(-1, 1))
-
-        train_other = np.array(learn_features[:,1:])
-        other_scaler = MinMaxScaler()
-        train_other_normalized = other_scaler.fit_transform(train_other)
-
-        train_final_other = np.array(learn_features[:, 1:])
-        train_final_other_normalized = other_scaler.fit_transform(train_final_other)
-
-        train_normalized = np.column_stack([train_stands_normalized, train_other_normalized])
-        train_final_normalized = np.column_stack([train_final_stands_normalized, train_final_other_normalized])
-
-        look_back = window_size
-        step = 1
-
-        X_train, y_train = create_dataset_with_steps(train_normalized, look_back, step)
-        X_final, y_final = create_dataset_with_steps(train_final_normalized, look_back, step)
-
-        X_train = X_train.reshape(X_train.shape[0], X_train.shape[2], X_train.shape[1])
-        X_final = X_final.reshape(X_final.shape[0], X_final.shape[2], X_final.shape[1])
-
-        print(f"X_train shape: {X_train.shape}")
-
-        input_shape = (X_train.shape[1], X_train.shape[2])
-
         lstm_model_final = build_lstm_model(input_shape)
-        train_lstm_model(lstm_model_final, X_final, y_final, epochs=30)
+        lstm_model_final = train_lstm_model(lstm_model_final, X_final, y_final, epochs=2)
 
         mlflow.log_param("train_size", train_size)
 
+        #save moel
+        mlfflow_helper.save_model_onnx(lstm_model_final, station_name,X_final,window_size, ml_flow_client)
+        """ 
+                # SAVE MODEL
+                lstm_model_final.output_names = ['output']
+
+                input_signature = [tf.TensorSpec(shape=(None, window_size, 8), dtype=tf.double, name="input")]
+
+                #convert model to onnx
+                onnx_model, _ = tf2onnx.convert.from_keras(lstm_model_final, input_signature=input_signature, opset=13)
+
+                # Log the model
+                onnx_model = mlflow.onnx.log_model(
+                    onnx_model=onnx_model,
+                    artifact_path=f"models/{station_name}/model", 
+                    registered_model_name=f"model_{station_name}"
+                )
+
+                # Create model version
+
+                model_version = ml_flow_client.create_model_version(
+                    name=f"model={station_name}",
+                    source=onnx_model,
+                    run_id=onnx_model.run_id
+                )
+
+                # Transition model version to staging
+                ml_flow_client.transition_model_version_stage(
+                    name=f"model={station_name}",
+                    version=model_version.version,
+                    stage="staging",
+                ) 
+        """
+
+        # SAVE SCALAR
+
+        mlfflow_helper.save_scalar(ml_flow_client,stands_scalar, station_name, "scaler")
+        mlfflow_helper.save_scalar(ml_flow_client,other_scarlar, station_name, "other_scaler")
 
     mlflow.end_run()
     print("ending run")
-    lstm_model_final.save(f'../../models/{station_name}_model.h5')
-    joblib.dump(stands_scaler, f'../../models/{station_name}_scaler.pkl')
-    joblib.dump(other_scaler, f'../../models/{station_name}_other_scaler.pkl')
 
+    #lstm_model_final.save(f'../../models/{station_name}_model.h5')
+    #joblib.dump(stands_scaler, f'../../models/{station_name}_scaler.pkl')
+    #joblib.dump(other_scaler, f'../../models/{station_name}_other_scaler.pkl')
 
 
 def main():
-
-    train_model("../../data/raw/og_dataset.csv", "test", window_size=8, test=False)
+    train_model("../../data/test_train/train_1.csv", "test", window_size=8, test=False)
 
 if __name__ == '__main__':
     main()

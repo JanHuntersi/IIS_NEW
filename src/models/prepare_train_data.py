@@ -1,19 +1,28 @@
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import mean_squared_error
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_absolute_error, mean_squared_error, explained_variance_score
-import joblib
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense
 import matplotlib.pyplot as plt
 from sklearn.feature_selection import mutual_info_regression
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, GRU, Dense
-import matplotlib.pyplot as plt
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import MinMaxScaler
+
+def info_gains(data):
+    target = data['available_bike_stands']
+    features = data.drop(columns=['available_bike_stands', 'date'])
+
+    info_gains = mutual_info_regression(features, target)
+
+    info_gains = pd.Series(info_gains, index=features.columns)
+    info_gains.sort_values(ascending=False, inplace=True)
+
+    return info_gains
 
 def prepare_train_data(data):
+
+    pipeline = Pipeline(steps=[
+        ('scaler', MinMaxScaler()),
+        ('model', RandomForestRegressor())
+    ])
 
     data['date'] = pd.to_datetime(data['date'])
     data.sort_values(by='date', inplace=True)
@@ -38,11 +47,11 @@ def prepare_train_data(data):
         X = complete_data[complete_values_cols]
         y = complete_data[column]
         
-        model = RandomForestRegressor()
-        model.fit(X, y)
+        pipeline.fit(X,y)
+
         
         missing_X = missing_data[complete_values_cols]
-        predictions = model.predict(missing_X)
+        predictions = pipeline.predict(missing_X)
         
         data.loc[missing_data.index, column] = predictions
 
@@ -69,17 +78,7 @@ def prepare_train_data(data):
         data[col] = np.log(data[col]+1 )
 
     #INFO GAINS
-    #target = data['available_bike_stands']
-    #features = data.drop(columns=['available_bike_stands', 'date'])
-
-    #info_gains = mutual_info_regression(features, target)
-
-    #info_gains = pd.Series(info_gains, index=features.columns)
-    #info_gains.sort_values(ascending=False, inplace=True)
-
-    #threshold = 0.1
-
-    #selected_features = info_gains[info_gains > threshold].index.tolist()
+    #info_gains = info_gains(data)
 
     selected_features = ['temperature_2m',
         'apparent_temperature',
@@ -90,4 +89,4 @@ def prepare_train_data(data):
 
     learn_features = data[ ['available_bike_stands']+ list(selected_features)]
     learn_features = learn_features.values
-    return learn_features, data
+    return learn_features, data, pipeline
