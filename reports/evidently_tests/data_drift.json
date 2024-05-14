@@ -1,7 +1,7 @@
 {
-  "id": "4298c22a-6da3-44cb-82e9-1865f481dd9c",
+  "id": "97802a53-63a0-4b19-bf60-f22bd0cc48b3",
   "name": null,
-  "timestamp": "2024-05-14T22:26:52.128685",
+  "timestamp": "2024-05-14T23:26:35.502140",
   "metadata": {
     "metric_presets": [
       "DataDriftPreset"
@@ -10595,48 +10595,48 @@
     },
     "data_definition": {
       "columns": {
-        "precipitation_probability": {
-          "column_name": "precipitation_probability",
-          "column_type": "num"
-        },
-        "temperature_2m": {
-          "column_name": "temperature_2m",
-          "column_type": "num"
-        },
         "precipitation": {
           "column_name": "precipitation",
-          "column_type": "num"
-        },
-        "available_bike_stands": {
-          "column_name": "available_bike_stands",
-          "column_type": "num"
-        },
-        "available_bikes": {
-          "column_name": "available_bikes",
           "column_type": "num"
         },
         "apparent_temperature": {
           "column_name": "apparent_temperature",
           "column_type": "num"
         },
-        "relative_humidity_2m": {
-          "column_name": "relative_humidity_2m",
+        "precipitation_probability": {
+          "column_name": "precipitation_probability",
           "column_type": "num"
         },
-        "surface_pressure": {
-          "column_name": "surface_pressure",
+        "relative_humidity_2m": {
+          "column_name": "relative_humidity_2m",
           "column_type": "num"
         },
         "dew_point_2m": {
           "column_name": "dew_point_2m",
           "column_type": "num"
         },
-        "number": {
-          "column_name": "number",
-          "column_type": "cat"
+        "surface_pressure": {
+          "column_name": "surface_pressure",
+          "column_type": "num"
+        },
+        "available_bikes": {
+          "column_name": "available_bikes",
+          "column_type": "num"
+        },
+        "available_bike_stands": {
+          "column_name": "available_bike_stands",
+          "column_type": "num"
+        },
+        "temperature_2m": {
+          "column_name": "temperature_2m",
+          "column_type": "num"
         },
         "date": {
           "column_name": "date",
+          "column_type": "cat"
+        },
+        "number": {
+          "column_name": "number",
           "column_type": "cat"
         }
       },
