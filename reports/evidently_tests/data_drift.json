@@ -1,7 +1,7 @@
 {
-  "id": "64dbdebd-16fd-49b6-b451-387f8667982e",
+  "id": "d1d835ec-1f63-4779-9a34-f5978baf6088",
   "name": null,
-  "timestamp": "2024-05-15T22:28:28.153360",
+  "timestamp": "2024-05-15T23:29:04.430086",
   "metadata": {
     "metric_presets": [
       "DataDriftPreset"
@@ -6406,7 +6406,7 @@
                     "146": 1.2847665157529602,
                     "147": 0.8351646544245029,
                     "148": 0.6284902544988247,
-                    "149": 1.1145813862911338
+                    "149": 1.1145813862911327
                   }
                 }
               },
@@ -10759,16 +10759,20 @@
     },
     "data_definition": {
       "columns": {
-        "dew_point_2m": {
-          "column_name": "dew_point_2m",
+        "available_bike_stands": {
+          "column_name": "available_bike_stands",
           "column_type": "num"
         },
-        "apparent_temperature": {
-          "column_name": "apparent_temperature",
+        "relative_humidity_2m": {
+          "column_name": "relative_humidity_2m",
           "column_type": "num"
         },
         "surface_pressure": {
           "column_name": "surface_pressure",
+          "column_type": "num"
+        },
+        "available_bikes": {
+          "column_name": "available_bikes",
           "column_type": "num"
         },
         "precipitation": {
@@ -10779,20 +10783,16 @@
           "column_name": "precipitation_probability",
           "column_type": "num"
         },
-        "available_bike_stands": {
-          "column_name": "available_bike_stands",
-          "column_type": "num"
-        },
-        "relative_humidity_2m": {
-          "column_name": "relative_humidity_2m",
+        "dew_point_2m": {
+          "column_name": "dew_point_2m",
           "column_type": "num"
         },
         "temperature_2m": {
           "column_name": "temperature_2m",
           "column_type": "num"
         },
-        "available_bikes": {
-          "column_name": "available_bikes",
+        "apparent_temperature": {
+          "column_name": "apparent_temperature",
           "column_type": "num"
         },
         "number": {
