@@ -1,7 +1,7 @@
 {
-  "id": "61c4c20e-de2c-4b71-bcda-91143b935ee5",
+  "id": "9eb1d801-8288-4010-8218-c5d1bfc3a303",
   "name": null,
-  "timestamp": "2024-05-16T22:28:52.581628",
+  "timestamp": "2024-05-16T23:29:19.293468",
   "metadata": {
     "metric_presets": [
       "DataDriftPreset"
@@ -73,7 +73,7 @@
             "column_type": "num",
             "stattest_name": "K-S p_value",
             "stattest_threshold": 0.05,
-            "drift_score": 1.0,
+            "drift_score": 0.9999999999999994,
             "drift_detected": false,
             "current": {
               "type": "evidently.calculations.data_drift.DriftStatsField",
@@ -543,7 +543,7 @@
                     "146": 12.552110666666666,
                     "147": 14.14586925,
                     "148": 14.97054175,
-                    "149": 13.6825485
+                    "149": 13.682548500000001
                   },
                   "std": {
                     "0": 2.6757962478633535,
@@ -695,7 +695,7 @@
                     "146": 0.7308222929825917,
                     "147": 0.9989190404700397,
                     "148": 0.41609538423409154,
-                    "149": 0.5180677916852847
+                    "149": 0.5180677916852856
                   }
                 }
               },
@@ -10931,12 +10931,8 @@
     },
     "data_definition": {
       "columns": {
-        "relative_humidity_2m": {
-          "column_name": "relative_humidity_2m",
-          "column_type": "num"
-        },
-        "available_bikes": {
-          "column_name": "available_bikes",
+        "precipitation_probability": {
+          "column_name": "precipitation_probability",
           "column_type": "num"
         },
         "surface_pressure": {
@@ -10951,10 +10947,6 @@
           "column_name": "apparent_temperature",
           "column_type": "num"
         },
-        "dew_point_2m": {
-          "column_name": "dew_point_2m",
-          "column_type": "num"
-        },
         "precipitation": {
           "column_name": "precipitation",
           "column_type": "num"
@@ -10963,16 +10955,24 @@
           "column_name": "temperature_2m",
           "column_type": "num"
         },
-        "precipitation_probability": {
-          "column_name": "precipitation_probability",
+        "relative_humidity_2m": {
+          "column_name": "relative_humidity_2m",
           "column_type": "num"
         },
-        "date": {
-          "column_name": "date",
-          "column_type": "cat"
+        "dew_point_2m": {
+          "column_name": "dew_point_2m",
+          "column_type": "num"
+        },
+        "available_bikes": {
+          "column_name": "available_bikes",
+          "column_type": "num"
         },
         "number": {
           "column_name": "number",
+          "column_type": "cat"
+        },
+        "date": {
+          "column_name": "date",
           "column_type": "cat"
         }
       },
