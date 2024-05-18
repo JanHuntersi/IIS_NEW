@@ -141,6 +141,8 @@ def evaluate_model(data_path, station_name, window_size):
 
 
         # file path
+        if not os.path.exists(test_metrics_dir):
+            os.makedirs(test_metrics_dir)
         test_metrics_path = os.path.join(test_metrics_dir, f"{station_name}_test_metrics.csv")
 
         tm.save_test_metrics(lstm_mae_adv, lstm_mse_adv, lstm_evs_adv, test_metrics_path)

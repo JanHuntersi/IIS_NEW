@@ -75,7 +75,7 @@ jobs:
           fi
       - name: Evaluate models
         run: |
-          poetry run python src/models/evaluate_all_models.py
+          poetry run python src/models/evaluate_model.py
           if [ $? -eq 0 ]; then 
             echo "evaluate_all_models.py executed successfully."
           else
