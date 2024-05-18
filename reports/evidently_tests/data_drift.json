@@ -1,7 +1,7 @@
 {
-  "id": "f96452f6-7136-4374-9488-9611b13eb9f2",
+  "id": "09128776-582d-4414-96d9-d01f1157b75e",
   "name": null,
-  "timestamp": "2024-05-18T22:24:21.163122",
+  "timestamp": "2024-05-18T23:25:22.938235",
   "metadata": {
     "metric_presets": [
       "DataDriftPreset"
@@ -11279,20 +11279,16 @@
     },
     "data_definition": {
       "columns": {
-        "surface_pressure": {
-          "column_name": "surface_pressure",
+        "precipitation_probability": {
+          "column_name": "precipitation_probability",
           "column_type": "num"
         },
         "dew_point_2m": {
           "column_name": "dew_point_2m",
           "column_type": "num"
         },
-        "available_bike_stands": {
-          "column_name": "available_bike_stands",
-          "column_type": "num"
-        },
-        "apparent_temperature": {
-          "column_name": "apparent_temperature",
+        "relative_humidity_2m": {
+          "column_name": "relative_humidity_2m",
           "column_type": "num"
         },
         "temperature_2m": {
@@ -11303,16 +11299,20 @@
           "column_name": "precipitation",
           "column_type": "num"
         },
-        "relative_humidity_2m": {
-          "column_name": "relative_humidity_2m",
+        "apparent_temperature": {
+          "column_name": "apparent_temperature",
           "column_type": "num"
         },
         "available_bikes": {
           "column_name": "available_bikes",
           "column_type": "num"
         },
-        "precipitation_probability": {
-          "column_name": "precipitation_probability",
+        "surface_pressure": {
+          "column_name": "surface_pressure",
+          "column_type": "num"
+        },
+        "available_bike_stands": {
+          "column_name": "available_bike_stands",
           "column_type": "num"
         },
         "number": {
