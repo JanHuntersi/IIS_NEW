@@ -1,0 +1,80 @@
+name: Train & evaluate my models
+
+on: 
+  workflow_run:
+    workflows: ["Fetch and process data every hour"]
+    types:
+      - completed
+  workflow_dispatch:
+
+env:
+  DVC_ACCESS_KEY_ID: ${{ secrets.DVC_ACCESS_KEY_ID }}
+  DVC_SECRET_ACCESS_KEY: ${{ secrets.DVC_SECRET_ACCESS_KEY }}
+
+jobs:
+  train_and_evaluate:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 15
+
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.2
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          poetry --version
+
+      - run: poetry install --no-interaction --no-root
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+      - name: Install dependencies
+        run: |
+          poetry install
+
+      - name: Install DVC
+        uses: iterative/setup-dvc@v1
+      
+      - name: Configure Dagshub
+        run: |
+          poetry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
+          poetry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
+          poetry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
+
+      - name: DVC Pull Data
+        run: |
+          poetry run dvc pull -r origin
+
+      - name: Train models
+        run: |
+          poetry run python src/models/train_all_models.py
+          if [ $? -eq 0 ]; then 
+            echo "train_all_models.py executed successfully."
+          else
+            echo "Error executing train_all_models.py."
+            exit 1 
+          fi
+      - name: Evaluate models
+        run: |
+          poetry run python src/models/evaluate_all_models.py
+          if [ $? -eq 0 ]; then 
+            echo "evaluate_all_models.py executed successfully."
+          else
+            echo "Error executing evaluate_all_models.py."
+            exit 1 
+          fi
