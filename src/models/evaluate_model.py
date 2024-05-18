@@ -25,9 +25,10 @@ test_metrics_dir = os.path.join(current_dir, '..', '..', 'reports', 'test_metric
 processed_path = os.path.join(current_dir, '..', '..', 'data', 'test_train')
 
 def evaluate_model(data_path, station_name, window_size):
+    dagshub.auth.add_app_token(settings.mlflow_tracking_password)
     dagshub.init(repo_owner='JanHuntersi', repo_name='IIS_NEW', mlflow=True)
     print("starting run")
-    print("station_name: ",settings.mlflow_tracking_password)
+    print("station_name: ",station_name)
 
     experiment_name = f"station_{station_name}_test"
     mlflow.set_experiment(experiment_name)

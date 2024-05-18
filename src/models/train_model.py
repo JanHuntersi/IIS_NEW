@@ -180,10 +180,12 @@ def save_model_onnx(model,station_name,X_test,window_size=16,mlflow_client=mlflo
 
 def train_model(data_path, station_name, window_size=16, test_size_multiplier=5, test=False):
    
+    dagshub.auth.add_app_token(settings.mlflow_tracking_password)
     dagshub.init(repo_owner='JanHuntersi', repo_name='IIS_NEW', mlflow=True)
    
     print("starting run")
-    print("station_name: ",settings.mlflow_tracking_password)
+    print("station_name: ",station_name)
+    #print("station_name: ",settings.mlflow_tracking_password)
 
     ml_flow_client = MlflowClient()
 
