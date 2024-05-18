@@ -23,6 +23,11 @@ from mlflow import MlflowClient
 import tensorflow as tf
 from mlflow.models import infer_signature
 import src.models.mlflow_helper as mlfflow_helper
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+test_metrics_dir = os.path.join(current_dir, '..', '..', 'reports', 'train_metrics')
 
 def calculate_metrics(y_test, y_pred):
     mae = mean_absolute_error(y_test, y_pred)
@@ -45,6 +50,8 @@ def histogram_plot(data):
     plt.show()
 
 def save_train_metrics(history, file_path):
+    #create new file or overwrite existing
+    
     with open(file_path, 'w') as file:
         file.write("Epoch\tTrain Loss\tValidation Loss\n")
         for epoch, (train_loss, val_loss) in enumerate(zip(history.history['loss'], history.history['val_loss']), start=1):
@@ -68,7 +75,8 @@ def build_lstm_model(input_shape):
 def train_lstm_model(model, X_train, y_train, epochs=2, station_name = "default",test=False) :
     model.compile(optimizer='adam', loss='mean_squared_error')
     history = model.fit(X_train, y_train, epochs=epochs, batch_size=32, validation_split=0.2, verbose=1)
-    save_train_metrics(history, f"../../reports/{station_name}_train_metrics.txt")
+    path = os.path.join(test_metrics_dir, f"{station_name}_train_metrics.txt")
+    save_train_metrics(history, path)
     return model
 
 def actually_train_model(data_path, station_name, window_size=16, test_size_multiplier=5, test=False,client=mlflow.MlflowClient()):
