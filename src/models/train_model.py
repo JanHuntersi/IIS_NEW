@@ -75,6 +75,10 @@ def build_lstm_model(input_shape):
 def train_lstm_model(model, X_train, y_train, epochs=2, station_name = "default",test=False) :
     model.compile(optimizer='adam', loss='mean_squared_error')
     history = model.fit(X_train, y_train, epochs=epochs, batch_size=32, validation_split=0.2, verbose=1)
+    
+    #make directory if it does not exist
+    if not os.path.exists(test_metrics_dir):
+        os.makedirs(test_metrics_dir)
     path = os.path.join(test_metrics_dir, f"{station_name}_train_metrics.txt")
     save_train_metrics(history, path)
     return model
