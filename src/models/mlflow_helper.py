@@ -5,6 +5,8 @@ from mlflow.models import infer_signature
 from src.helpers.tools import make_dir_if_not_exist
 import os
 import joblib
+from definitions import ROOT_DIR
+import onnx
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 models_dir = os.path.join(current_dir, '..', '..', 'models')
@@ -72,7 +74,7 @@ def save_model_onnx(model,station_name,X_test,window_size=16,mlflow_client=mlflo
 
 
 # save scalar
-def save_scalar(mlf_flow_client,scaler, station_name, scalar_type):
+def save_scalar(mlf_flow_client,scaler, station_name, scalar_type,version_type="staging"):
     metadata = {
         "station_name": station_name,
         "scaler_type": scalar_type,
@@ -96,7 +98,7 @@ def save_scalar(mlf_flow_client,scaler, station_name, scalar_type):
     mlf_flow_client.transition_model_version_stage(
         name=f"{scalar_type}={station_name}",
         version=scaler_version.version,
-        stage="staging",
+        stage=version_type,
     )
 
     print(f"Saved {scalar_type} for {station_name}")
@@ -113,17 +115,19 @@ def download_latest_model(station_name,stage):
         model = mlflow.onnx.load_model( client.get_latest_versions(name=model_name, stages=[stage])[0].source)
 
         # make dir if not exists
-        model_path = os.path.join(models_dir,station_name)
+        model_path = os.path.join(ROOT_DIR,"models",f"{station_name}")
         make_dir_if_not_exist(model_path)
 
         model_path = os.path.join(model_path, f"{station_name}_{stage}_model.onnx")
 
 
-        mlflow.onnx.save_model(model, model_path)
+        #TODO onnx.save_model(model, model_path)
 
-        print(f"Model {model_name}  downloaded successfully")
+        print(f"Model {model_name} with path {model_path}  downloaded successfully")
 
-        return model_path
+
+        #TODO return model_path
+        return model
     except Exception as e:
         print(f"Error: {e}")
         model = None
@@ -138,7 +142,7 @@ def download_scaler(station_name, scaler_type, stage):
             scaler = mlflow.sklearn.load_model( client.get_latest_versions(name=scaler_name, stages=[stage])[0].source)
     
             # make dir if not exists
-            scaler_path = os.path.join(models_dir,station_name)
+            scaler_path = os.path.join(models_dir,f"{station_name}")
             make_dir_if_not_exist(scaler_path)
     
             scaler_path = os.path.join(scaler_path, f"{station_name}_{stage}_{scaler_type}.pkl")

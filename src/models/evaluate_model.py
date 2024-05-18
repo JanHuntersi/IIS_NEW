@@ -22,7 +22,7 @@ import onnxruntime
 current_dir = os.path.dirname(os.path.abspath(__file__))
 models_dir = os.path.join(current_dir, '..', '..', 'models')
 test_metrics_dir = os.path.join(current_dir, '..', '..', 'reports', 'test_metrics')
-processed_path = os.path.join(current_dir, '..', '..', 'data', 'processed')
+processed_path = os.path.join(current_dir, '..', '..', 'data', 'test_train')
 
 def evaluate_model(data_path, station_name, window_size):
     dagshub.init(repo_owner='JanHuntersi', repo_name='IIS_NEW', mlflow=True)
@@ -52,9 +52,9 @@ def evaluate_model(data_path, station_name, window_size):
 
         print(f"Trying to download latest staging model  for station {station_name}") 
         
-        staging_model = mlfflow_helper.download_latest_model(mlflow, station_name, "staging")
-        staging_scaler = mlfflow_helper.download_scaler(mlflow, station_name, "scaler", "staging")
-        staging_other_scaler = mlfflow_helper.download_scaler(mlflow, station_name, "other_scaler", "staging")
+        staging_model = mlfflow_helper.download_latest_model(station_name, "staging")
+        staging_scaler = mlfflow_helper.download_scaler(station_name, "scaler", "staging")
+        staging_other_scaler = mlfflow_helper.download_scaler(station_name, "other_scaler", "staging")
 
         if staging_model is None or staging_scaler is None or staging_other_scaler is None:
             print(f"Could not download model for station {station_name}, skipping evaluation..")
@@ -63,9 +63,9 @@ def evaluate_model(data_path, station_name, window_size):
         
         print(f"Trying to download latest production model  for station {station_name}") 
         
-        prod_model = mlfflow_helper.download_latest_model(mlflow, station_name, "production")
-        prod_scaler = mlfflow_helper.download_scaler(mlflow, station_name, "scaler", "production")
-        prod_other_scaler = mlfflow_helper.download_scaler(mlflow, station_name, "other_scaler", "production")
+        prod_model = mlfflow_helper.download_latest_model(station_name, "production")
+        prod_scaler = mlfflow_helper.download_scaler(station_name, "scaler", "production")
+        prod_other_scaler = mlfflow_helper.download_scaler(station_name, "other_scaler", "production")
 
         if prod_model is None or prod_scaler is None or prod_other_scaler is None:
             print(f"Production model does not exist for station {station_name}, using staging model..")
@@ -76,14 +76,16 @@ def evaluate_model(data_path, station_name, window_size):
 
         #https://stackoverflow.com/questions/71279968/getting-a-prediction-from-an-onnx-model-in-python
 
-        staging_model = onnxruntime.InferenceSession(staging_model)
-        prod_model = onnxruntime.InferenceSession(prod_model)
+        #print("inference session", staging_model)
+
+        staging_model = onnxruntime.InferenceSession(staging_model.SerializeToString())
+        prod_model = onnxruntime.InferenceSession(prod_model.SerializeToString())
 
         data = pd.read_csv(data_path)
 
         print("FOR STATION: ",station_name)
 
-        learn_features, data = ptd.prepare_train_data(data)
+        learn_features, data, pipeline = ptd.prepare_train_data(data)
 
         stands_data = np.array(learn_features[:, 0])
         stands_normalized = staging_scaler.transform(stands_data.reshape(-1, 1))
@@ -149,10 +151,11 @@ def evaluate_model(data_path, station_name, window_size):
     mlflow.end_run()
 
 def main():
-    for i in range(1,30):
+    for i in range(1,3):
         print(f"Evaluating model for station {i}")
-        file_path = os.path.join(processed_path, f"{i}.csv")
+        file_path = os.path.join(processed_path, f"test_{i}.csv")
         evaluate_model(file_path,i, 8)
+        #return
     
 if __name__ == '__main__':
     main()

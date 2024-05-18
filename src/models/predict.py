@@ -7,12 +7,12 @@ from datetime import timedelta
 import os
 import src.data.fetch_weather as weather_logic
 import requests
+import onnxruntime as ort
 
 
 
 # Get the directory of the current Python script
 current_dir = os.path.dirname(os.path.abspath(__file__))
-models_dir = os.path.join(current_dir, '..', '..', 'models')
 models_dir = os.path.join(current_dir, '..', '..', 'models')
 
 processed_dataset_dir = os.path.join(current_dir, '..', '..', 'data', 'processed')
@@ -34,12 +34,12 @@ def get_lang_long_from_station(station_number):
 # For testing purposes
 def predict(data, station_name = "test"):
 
-    model_path = os.path.join(models_dir, f'{station_name}_model.h5')
+    model_path = os.path.join(models_dir,station_name, f'{station_name}_production_model.onnx')
     stands_path = os.path.join(models_dir, f'{station_name}_scaler.pkl')
-    other_scaler_path = os.path.join(models_dir, f'{station_name}_other_scaler.pkl')
+    other_scaler_path = os.path.join(models_dir, f'{station_name}_production_other_scaler.pkl')
 
 
-    model = tf.keras.models.load_model(model_path)
+    model =  ort.InferenceSession(model_path)
     stands_scaler = joblib.load(stands_path)
     other_scaler = joblib.load(other_scaler_path)
 
@@ -86,7 +86,7 @@ def predict(data, station_name = "test"):
     X_predict = X_predict.reshape(1, X_predict.shape[1], X_predict.shape[0])
     
 
-    prediction = model.predict(X_predict)
+    prediction = model.run(["output"],{"input":X_predict})[0]
     prediction =  stands_scaler.inverse_transform(prediction)
     return prediction
 
@@ -119,7 +119,7 @@ def make_prediction(data, model, stands_scaler, other_scaler):
     X_predict = X_predict.reshape(1, X_predict.shape[1], X_predict.shape[0])
     
 
-    prediction = model.predict(X_predict)
+    prediction = model.run(["output"], {"input":X_predict})[0]
     prediction =  stands_scaler.inverse_transform(prediction)
     return prediction
 
@@ -127,16 +127,15 @@ def predict_station(station_name,windowsize=24):
 
     print("hello from predict_station", station_name)
 
-    model_path = os.path.join(models_dir, f'{station_name}_model.h5')
+    model_path = os.path.join(models_dir,station_name, f'{station_name}_production_model.onnx')
     stands_path = os.path.join(models_dir, f'{station_name}_scaler.pkl')
-    other_scaler_path = os.path.join(models_dir, f'{station_name}_other_scaler.pkl')
+    other_scaler_path = os.path.join(models_dir, f'{station_name}_production_other_scaler.pkl')
 
-    model = tf.keras.models.load_model(model_path)
+    model =  ort.InferenceSession(model_path)
     stands_scaler = joblib.load(stands_path)
     other_scaler = joblib.load(other_scaler_path)
 
 
-    #TODO use proccessed when its big enough
     processed_dataset_dir = os.path.join(current_dir, '..', '..', 'data', 'processed',f"{station_name}.csv")
 
     #use og for now

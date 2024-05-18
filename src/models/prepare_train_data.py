@@ -27,7 +27,7 @@ def prepare_train_data(data):
     data['date'] = pd.to_datetime(data['date'])
     data.sort_values(by='date', inplace=True)
 
-    print("data features: ", data.columns)
+    #print("data features: ", data.columns)
 
     features = ['available_bike_stands', 'temperature_2m', 'relative_humidity_2m',
                 'apparent_temperature', 'dew_point_2m', 'precipitation_probability',
@@ -55,7 +55,7 @@ def prepare_train_data(data):
         
         data.loc[missing_data.index, column] = predictions
 
-    print(data.isnull().sum())
+    #print(data.isnull().sum())
 
     #AGGREGATING DATA TO INTERVAL
 

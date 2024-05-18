@@ -21,6 +21,7 @@ import onnxruntime as ort
 import tf2onnx
 from mlflow import MlflowClient
 import tensorflow as tf
+from mlflow.models import infer_signature
 import src.models.mlflow_helper as mlfflow_helper
 
 def calculate_metrics(y_test, y_pred):
@@ -64,7 +65,7 @@ def build_lstm_model(input_shape):
     model.add(Dense(units=1))
     return model
 
-def train_lstm_model(model, X_train, y_train, epochs=50, station_name = "default",test=False) :
+def train_lstm_model(model, X_train, y_train, epochs=2, station_name = "default",test=False) :
     model.compile(optimizer='adam', loss='mean_squared_error')
     history = model.fit(X_train, y_train, epochs=epochs, batch_size=32, validation_split=0.2, verbose=1)
     save_train_metrics(history, f"../../reports/{station_name}_train_metrics.txt")
@@ -77,10 +78,11 @@ def actually_train_model(data_path, station_name, window_size=16, test_size_mult
 
     learn_features, data, pipeline = tm.prepare_train_data(data)
 
-    mlfflow_helper.save_pipeline(client,pipeline,station_name)
+    #disabled saving pipeline
+    #mlfflow_helper.save_pipeline(client,pipeline,station_name)
 
     train_size = len(learn_features)
-    print(learn_features.shape)
+    #print(learn_features.shape)
 
     train_stands = np.array(learn_features[:,0])
     
@@ -109,7 +111,7 @@ def actually_train_model(data_path, station_name, window_size=16, test_size_mult
     X_train = X_train.reshape(X_train.shape[0], X_train.shape[2], X_train.shape[1])
     X_final = X_final.reshape(X_final.shape[0], X_final.shape[2], X_final.shape[1])
 
-    print(f"X_train shape: {X_train.shape}")
+    #print(f"X_train shape: {X_train.shape}")
 
     input_shape = (X_train.shape[1], X_train.shape[2])
 
@@ -142,6 +144,40 @@ def save_scalar(mlf_flow_client,scaler, station_name, scalar_type):
         stage="staging",
     )
     
+def save_model_onnx(model,station_name,X_test,window_size=16,mlflow_client=mlflow.MlflowClient()):
+ # SAVE MODEL
+    model.output_names = ['output']
+
+    input_signature = [tf.TensorSpec(shape=(None, window_size, 8), dtype=tf.double, name="input")]
+
+    #convert model to onnx
+    onnx_model, _ = tf2onnx.convert.from_keras(model, input_signature=input_signature, opset=13)
+
+    # Log the model
+    onnx_model = mlflow.onnx.log_model(
+        onnx_model=onnx_model,
+        artifact_path=f"models/{station_name}/model", 
+        signature=infer_signature(X_test, model.predict(X_test)),
+        registered_model_name=f"model={station_name}"
+    )
+    # Create model version
+
+    model_version = mlflow_client.create_model_version(
+        name=f"model={station_name}",
+        source=onnx_model.model_uri,
+        run_id=onnx_model.run_id
+    )
+
+    # Transition model version to staging
+    mlflow_client.transition_model_version_stage(
+        name=f"model={station_name}",
+        version=model_version.version,
+        stage="staging",
+    )
+
+    print(f"Saved model for {station_name}")
+
+
 def train_model(data_path, station_name, window_size=16, test_size_multiplier=5, test=False):
    
     dagshub.init(repo_owner='JanHuntersi', repo_name='IIS_NEW', mlflow=True)
@@ -166,48 +202,20 @@ def train_model(data_path, station_name, window_size=16, test_size_multiplier=5,
         input_shape, X_final, y_final, train_size, stands_scalar, other_scarlar = actually_train_model(data_path, station_name, window_size, test_size_multiplier, test, ml_flow_client)
         
         lstm_model_final = build_lstm_model(input_shape)
-        lstm_model_final = train_lstm_model(lstm_model_final, X_final, y_final, epochs=2)
+        lstm_model_final = train_lstm_model(lstm_model_final, X_final, y_final, epochs=2,station_name=station_name)
 
         mlflow.log_param("train_size", train_size)
 
         #save moel
-        mlfflow_helper.save_model_onnx(lstm_model_final, station_name,X_final,window_size, ml_flow_client)
-        """ 
-                # SAVE MODEL
-                lstm_model_final.output_names = ['output']
-
-                input_signature = [tf.TensorSpec(shape=(None, window_size, 8), dtype=tf.double, name="input")]
-
-                #convert model to onnx
-                onnx_model, _ = tf2onnx.convert.from_keras(lstm_model_final, input_signature=input_signature, opset=13)
-
-                # Log the model
-                onnx_model = mlflow.onnx.log_model(
-                    onnx_model=onnx_model,
-                    artifact_path=f"models/{station_name}/model", 
-                    registered_model_name=f"model_{station_name}"
-                )
-
-                # Create model version
-
-                model_version = ml_flow_client.create_model_version(
-                    name=f"model={station_name}",
-                    source=onnx_model,
-                    run_id=onnx_model.run_id
-                )
-
-                # Transition model version to staging
-                ml_flow_client.transition_model_version_stage(
-                    name=f"model={station_name}",
-                    version=model_version.version,
-                    stage="staging",
-                ) 
-        """
-
+        #mlfflow_helper.save_model_onnx(lstm_model_final, station_name,X_final,window_size, ml_flow_client)
+        save_model_onnx(lstm_model_final,station_name,X_final,window_size,ml_flow_client)
         # SAVE SCALAR
+        
+        save_scalar(ml_flow_client,stands_scalar, station_name, "scaler")
+        save_scalar(ml_flow_client,other_scarlar, station_name, "other_scaler")
 
-        mlfflow_helper.save_scalar(ml_flow_client,stands_scalar, station_name, "scaler")
-        mlfflow_helper.save_scalar(ml_flow_client,other_scarlar, station_name, "other_scaler")
+        #mlfflow_helper.save_scalar(ml_flow_client,stands_scalar, station_name, "scaler","staging")
+        #mlfflow_helper.save_scalar(ml_flow_client,other_scarlar, station_name, "other_scaler","staging")
 
     mlflow.end_run()
     print("ending run")
