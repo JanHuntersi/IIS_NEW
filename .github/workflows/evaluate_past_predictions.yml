@@ -1,0 +1,74 @@
+name: Evaluate todays predictions
+
+on: 
+  schedule:
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+
+env:
+  DVC_ACCESS_KEY_ID: ${{ secrets.DVC_ACCESS_KEY_ID }}
+  DVC_SECRET_ACCESS_KEY: ${{ secrets.DVC_SECRET_ACCESS_KEY }}
+  MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+  MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
+  MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }} 
+  MONGODB_CONNECTION: ${{ secrets.MONGODB_CONNECTION }}
+
+
+jobs:
+  evaluate_past_predictions:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 15
+
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.2
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          poetry --version
+
+      - run: poetry install --no-interaction --no-root
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+      - name: Install dependencies
+        run: |
+          poetry install
+
+      - name: Install DVC
+        uses: iterative/setup-dvc@v1
+      
+      - name: Configure Dagshub
+        run: |
+          poetry run dvc remote modify origin endpointurl https://dagshub.com/JanHuntersi/IIS_NEW.s3
+          poetry run dvc remote modify origin --local access_key_id $DVC_ACCESS_KEY_ID
+          poetry run dvc remote modify origin --local secret_access_key $DVC_SECRET_ACCESS_KEY
+
+      - name: DVC Pull Data
+        run: |
+          poetry run dvc pull -r origin
+
+      - name: Evaluate past predictions
+        run: |
+          poetry run python src/serve/evaluate_predictions.py
+          if [ $? -eq 0 ]; then 
+            echo "evaluate_predictions.py executed successfully."
+          else
+            echo "Error executing evaluate_predictions.py."
+            exit 1 
+          fi
