@@ -1,7 +1,7 @@
 {
-  "id": "17a46157-af0a-4949-82eb-ae0c09d64a9b",
+  "id": "67ec7f95-258f-4c65-ac38-cf1b82e2eb56",
   "name": null,
-  "timestamp": "2024-05-19T22:27:08.608973",
+  "timestamp": "2024-05-19T23:27:20.194848",
   "metadata": {
     "metric_presets": [
       "DataDriftPreset"
@@ -11443,24 +11443,16 @@
           "column_name": "surface_pressure",
           "column_type": "num"
         },
-        "available_bikes": {
-          "column_name": "available_bikes",
-          "column_type": "num"
-        },
-        "temperature_2m": {
-          "column_name": "temperature_2m",
-          "column_type": "num"
-        },
-        "relative_humidity_2m": {
-          "column_name": "relative_humidity_2m",
-          "column_type": "num"
-        },
         "available_bike_stands": {
           "column_name": "available_bike_stands",
           "column_type": "num"
         },
-        "precipitation_probability": {
-          "column_name": "precipitation_probability",
+        "available_bikes": {
+          "column_name": "available_bikes",
+          "column_type": "num"
+        },
+        "relative_humidity_2m": {
+          "column_name": "relative_humidity_2m",
           "column_type": "num"
         },
         "dew_point_2m": {
@@ -11471,16 +11463,24 @@
           "column_name": "precipitation",
           "column_type": "num"
         },
+        "temperature_2m": {
+          "column_name": "temperature_2m",
+          "column_type": "num"
+        },
+        "precipitation_probability": {
+          "column_name": "precipitation_probability",
+          "column_type": "num"
+        },
         "apparent_temperature": {
           "column_name": "apparent_temperature",
           "column_type": "num"
         },
-        "number": {
-          "column_name": "number",
-          "column_type": "cat"
-        },
         "date": {
           "column_name": "date",
+          "column_type": "cat"
+        },
+        "number": {
+          "column_name": "number",
           "column_type": "cat"
         }
       },
