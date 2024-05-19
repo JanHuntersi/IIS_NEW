@@ -104,9 +104,9 @@ def get_forecast_data(latitude, longitude, station_number):
     current = response.Hourly()
     hourly_data = {
         "station_number": station_number,
-        "temperature": current.Variables(0).ValuesAsNumpy(),
-        "relative_humidity": current.Variables(1).ValuesAsNumpy(),
-        "dew_point": current.Variables(2).ValuesAsNumpy(),
+        "temperature_2m": current.Variables(0).ValuesAsNumpy(),
+        "relative_humidity_2m": current.Variables(1).ValuesAsNumpy(),
+        "dew_point_2m": current.Variables(2).ValuesAsNumpy(),
         "apparent_temperature": current.Variables(3).ValuesAsNumpy(),
         "precipitation_probability": current.Variables(4).ValuesAsNumpy(),
         "rain": current.Variables(5).ValuesAsNumpy(),

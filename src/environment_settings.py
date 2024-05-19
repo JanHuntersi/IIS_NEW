@@ -7,6 +7,7 @@ load_dotenv()
 mlflow_tracking_uri = os.getenv("MLFLOW_TRACKING_URI")
 mlflow_tracking_username = os.getenv("MLFLOW_TRACKING_USERNAME")
 mlflow_tracking_password = os.getenv("MLFLOW_TRACKING_PASSWORD")
+mongodb_connection = os.getenv("MONGODB_CONNECTION")
 
 
 # for testing purposes
