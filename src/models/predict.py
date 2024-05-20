@@ -127,16 +127,16 @@ def predict_station(station_name,models_scalers_dict,windowsize=24):
 
     print("hello from predict_station", station_name)
 
-    models_station_dir = os.path.join(models_dir,f"{station_name}")
-    model_path = os.path.join(models_station_dir, f'{station_name}_production_model.onnx')
-    stands_path = os.path.join(models_station_dir, f'{station_name}_scaler.pkl')
-    other_scaler_path = os.path.join(models_station_dir, f'{station_name}_production_other_scaler.pkl')
+    #models_station_dir = os.path.join(models_dir,f"{station_name}")
+    #model_path = os.path.join(models_station_dir, f'{station_name}_production_model.onnx')
+    #stands_path = os.path.join(models_station_dir, f'{station_name}_scaler.pkl')
+    #other_scaler_path = os.path.join(models_station_dir, f'{station_name}_production_other_scaler.pkl')
 
-    model =  ort.InferenceSession(model_path)
-    stands_scaler = joblib.load(stands_path)
-    other_scaler = joblib.load(other_scaler_path) 
-    #stands_scaler = models_scalers_dict["stands_scaler"]
-    #other_scaler = models_scalers_dict["other_scaler"]
+    model =  ort.InferenceSession(models_scalers_dict["model"].SerializeToString())
+    #stands_scaler = joblib.load(stands_path)
+    #other_scaler = joblib.load(other_scaler_path) 
+    stands_scaler = models_scalers_dict["stands_scaler"]
+    other_scaler = models_scalers_dict["other_scaler"]
 
 
     processed_dataset_dir = os.path.join(current_dir, '..', '..', 'data', 'processed',f"{station_name}.csv")
