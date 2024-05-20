@@ -22,7 +22,7 @@ function Station({ station, onClose }) {
 
 		const getPredictions = async () => {
 			const response = await fetch(
-				`http://127.0.0.1:5000/mbajk/predict/station/${station.number}`
+				`https://p01--iis-api--q6nfcmmd42sk.code.run/mbajk/predict/station/${station.number}`
 			);
 			const data = await response.json();
 			console.log(data);

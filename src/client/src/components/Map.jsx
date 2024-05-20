@@ -12,34 +12,36 @@ export default function Map() {
 
 	useEffect(() => {
 		// Check if map is already initialized
-		axios.get("http://127.0.0.1:5000/mbajk/stations").then((response) => {
-			setStations(response.data);
-			if (mapRef.current) {
-				response.data.forEach((station) => {
-					// Create a popup content with a link
-					const popupContent = `<b>${station.name}</b><br />`;
+		axios
+			.get("https://p01--iis-api--q6nfcmmd42sk.code.run/mbajk/stations")
+			.then((response) => {
+				setStations(response.data);
+				if (mapRef.current) {
+					response.data.forEach((station) => {
+						// Create a popup content with a link
+						const popupContent = `<b>${station.name}</b><br />`;
 
-					// Create marker with popup and add to map
-					const marker = L.marker(
-						[station.position.lat, station.position.lng],
-						{
-							icon: L.icon({
-								iconUrl: CustomMarkerIcon,
-								iconSize: [32, 32], // Set the size of your custom icon
-								iconAnchor: [16, 32], // Set the anchor point of your custom icon
-							}),
-						}
-					)
-						.addTo(mapRef.current)
-						.bindPopup(popupContent);
+						// Create marker with popup and add to map
+						const marker = L.marker(
+							[station.position.lat, station.position.lng],
+							{
+								icon: L.icon({
+									iconUrl: CustomMarkerIcon,
+									iconSize: [32, 32], // Set the size of your custom icon
+									iconAnchor: [16, 32], // Set the anchor point of your custom icon
+								}),
+							}
+						)
+							.addTo(mapRef.current)
+							.bindPopup(popupContent);
 
-					// Add click event listener to the marker
-					marker.on("click", () => {
-						setSelectedStation(station);
+						// Add click event listener to the marker
+						marker.on("click", () => {
+							setSelectedStation(station);
+						});
 					});
-				});
-			}
-		});
+				}
+			});
 
 		if (!mapRef.current) {
 			const mapInstance = L.map("map").setView([46.5547, 15.6459], 12);
