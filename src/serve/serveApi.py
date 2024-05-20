@@ -55,11 +55,11 @@ def download_all_models():
         print("Downloaded model, scalers for station:", i)
 
         #save model and scalers
-        make_dir_if_not_exist(os.path.join(models_dir, str(i)))
-        joblib.dump(stands_scaler, os.path.join(models_dir, str(i), f'{i}_scaler.pkl'))
-        joblib.dump(other_scaler, os.path.join(models_dir, str(i), f'{i}_production_other_scaler.pkl'))
-        onnx.save_model(model, os.path.join(models_dir, str(i), f'{i}_production_model.onnx'))
-        model.save_model(os.path.join(models_dir, str(i), f'{i}_production_model.onnx'))
+        #make_dir_if_not_exist(os.path.join(models_dir, str(i)))
+        #joblib.dump(stands_scaler, os.path.join(models_dir, str(i), f'{i}_scaler.pkl'))
+        #joblib.dump(other_scaler, os.path.join(models_dir, str(i), f'{i}_production_other_scaler.pkl'))
+        #onnx.save_model(model, os.path.join(models_dir, str(i), f'{i}_production_model.onnx'))
+        #model.save_model(os.path.join(models_dir, str(i), f'{i}_production_model.onnx'))
 
     print("All models downloaded")
     #print("models_scalers structure is:", models_scalers)
