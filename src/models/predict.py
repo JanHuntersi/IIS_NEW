@@ -13,7 +13,7 @@ import onnxruntime as ort
 
 # Get the directory of the current Python script
 current_dir = os.path.dirname(os.path.abspath(__file__))
-models_dir = os.path.join(current_dir, '..', '..', 'models')
+models_dir = os.path.join(current_dir, '..', 'serve', 'models')
 
 processed_dataset_dir = os.path.join(current_dir, '..', '..', 'data', 'processed')
 og_dataeset_dir = os.path.join(current_dir, '..', '..', 'data', 'raw', 'og_dataset.csv')
@@ -123,17 +123,20 @@ def make_prediction(data, model, stands_scaler, other_scaler):
     prediction =  stands_scaler.inverse_transform(prediction)
     return prediction
 
-def predict_station(station_name,windowsize=24):
+def predict_station(station_name,models_scalers_dict,windowsize=24):
 
     print("hello from predict_station", station_name)
 
-    model_path = os.path.join(models_dir,station_name, f'{station_name}_production_model.onnx')
-    stands_path = os.path.join(models_dir, f'{station_name}_scaler.pkl')
-    other_scaler_path = os.path.join(models_dir, f'{station_name}_production_other_scaler.pkl')
+    models_station_dir = os.path.join(models_dir,f"{station_name}")
+    model_path = os.path.join(models_station_dir, f'{station_name}_production_model.onnx')
+    stands_path = os.path.join(models_station_dir, f'{station_name}_scaler.pkl')
+    other_scaler_path = os.path.join(models_station_dir, f'{station_name}_production_other_scaler.pkl')
 
     model =  ort.InferenceSession(model_path)
     stands_scaler = joblib.load(stands_path)
-    other_scaler = joblib.load(other_scaler_path)
+    other_scaler = joblib.load(other_scaler_path) 
+    #stands_scaler = models_scalers_dict["stands_scaler"]
+    #other_scaler = models_scalers_dict["other_scaler"]
 
 
     processed_dataset_dir = os.path.join(current_dir, '..', '..', 'data', 'processed',f"{station_name}.csv")
@@ -165,36 +168,38 @@ def predict_station(station_name,windowsize=24):
     latitude , longitude = get_lang_long_from_station(station_name)
     weather_data = weather_logic.get_forecast_data(latitude, longitude, station_name)
 
-    #print("weather_data", weather_data)
+    print("weather_data", weather_data)
 
     predctions = []
     for i in range(7):
+        try:
+            prediction = make_prediction(data.copy(), model, stands_scaler, other_scaler)
+            predctions.append(float(prediction[0][0]))
 
-        prediction = make_prediction(data.copy(), model, stands_scaler, other_scaler)
-        predctions.append(float(prediction[0][0]))
+            if(i == 6):
+                break
 
-        if(i == 6):
+            last_data = data.tail(1)
+
+            station_data = {
+                "temperature_2m": weather_data["temperature_2m"][i], 
+                "relative_humidity_2m": weather_data["relative_humidity_2m"][i],
+                "dew_point_2m": weather_data["dew_point_2m"][i],
+                "apparent_temperature": weather_data["apparent_temperature"][i],
+                "precipitation_probability":  np.log(weather_data["precipitation_probability"][i]+1 ),
+                "surface_pressure": np.square(weather_data["surface_pressure"][i]),
+                "available_bikes": last_data["available_bikes"].values[0],
+                "available_bike_stands": prediction[0][0]
+            }
+
+            station_df = pd.DataFrame(station_data, index=[0])
+
+            data = pd.concat([data, station_df], ignore_index=True)
+
+            if len(data) > windowsize:
+                data = data.iloc[1:]
+        except Exception as e:
+            print("Error in prediction", e)
             break
-
-        last_data = data.tail(1)
-
-        station_data = {
-            "temperature_2m": weather_data["temperature_2m"][i], 
-            "relative_humidity_2m": weather_data["relative_humidity_2m"][i],
-            "dew_point_2m": weather_data["dew_point_2m"][i],
-            "apparent_temperature": weather_data["apparent_temperature"][i],
-            "precipitation_probability":  np.log(weather_data["precipitation_probability"][i]+1 ),
-            "surface_pressure": np.square(weather_data["surface_pressure"][i]),
-            "available_bikes": last_data["available_bikes"].values[0],
-            "available_bike_stands": prediction[0][0]
-        }
-
-        station_df = pd.DataFrame(station_data, index=[0])
-
-        data = pd.concat([data, station_df], ignore_index=True)
-
-        if len(data) > windowsize:
-            data = data.iloc[1:]
-
     return predctions
     

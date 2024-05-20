@@ -132,7 +132,7 @@ def download_latest_model(station_name,stage):
         print(f"Error: {e}")
         model = None
 
-def download_scaler(station_name, scaler_type, stage):
+def download_scaler(station_name, scaler_type, stage, return_scaler=False):
     
         scaler_name = f"{scaler_type}={station_name}"
     
@@ -141,6 +141,9 @@ def download_scaler(station_name, scaler_type, stage):
         try:
             scaler = mlflow.sklearn.load_model( client.get_latest_versions(name=scaler_name, stages=[stage])[0].source)
     
+            if return_scaler:
+                return scaler
+
             # make dir if not exists
             scaler_path = os.path.join(models_dir,f"{station_name}")
             make_dir_if_not_exist(scaler_path)
