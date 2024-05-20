@@ -12,6 +12,9 @@ import requests
 import src.models.mlflow_helper as mlfflow_helper
 import onnx
 from src.database.db_connector import insert_predictions
+import mlflow
+import dagshub.auth
+import src.environment_settings as settings
 
 
 def make_dir_if_not_exist(dir_path):
@@ -36,6 +39,10 @@ models_dir = os.path.join(current_dir,  'models')
 models_scalers = {}
 
 def download_all_models():
+    dagshub.auth.add_app_token(settings.mlflow_tracking_password)
+    dagshub.init(repo_owner='JanHuntersi', repo_name='IIS_NEW', mlflow=True)
+    mlflow.set_tracking_uri("https://dagshub.com/JanHuntersi/IIS_NEW.mlflow")
+
     print("downloading all models--")
     for i in range(1,30):
         #make dir for station
