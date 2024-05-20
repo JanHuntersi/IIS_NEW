@@ -1,0 +1,61 @@
+name: Deploy Client to Northflank
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - src/client
+  workflow_dispatch:
+
+env:
+   REGISTRY: ghcr.io
+   IMAGE_NAME: ${{ github.repository }}
+
+   PROJECT_ID: iis
+   SERVICE_ID: iis-client
+   CREDENTIALS_ID: iis-registry
+
+   DVC_ACCESS_KEY_ID: ${{ secrets.DVC_ACCESS_KEY_ID }}
+   DVC_SECRET_ACCESS_KEY: ${{ secrets.DVC_SECRET_ACCESS_KEY }}
+
+
+jobs:
+   build-and-deploy:
+      runs-on: ubuntu-20.04
+      permissions:
+         contents: read
+         packages: write
+
+      steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+            with:
+              ref: 'main'
+    
+          - name: Log in to the Container registry
+            uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+            with:
+              registry: ${{ env.REGISTRY }}
+              username: ${{ github.actor }}
+              password: ${{ secrets.GITHUB_TOKEN }}
+
+    
+          - name: Build and push Docker image
+            uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+            with:
+               context: .
+               push: true
+               tags: ${{ steps.meta.outputs.tags }}
+               labels: ${{ steps.meta.outputs.labels }}
+
+          
+
+          - name: Deploy to Northflank
+            uses: northflank/deploy-to-northflank@v1
+            with:
+               northflank-api-key: ${{ secrets.NORTHFLANK_API_KEY }}
+               project-id: ${{ env.PROJECT_ID }}
+               service-id: ${{ env.SERVICE_ID }}
+               image-path: ${{ steps.meta.outputs.tags }}
+               credentials-id: ${{ env.CREDENTIALS_ID }}
