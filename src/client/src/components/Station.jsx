@@ -52,7 +52,8 @@ function Station({ station, onClose }) {
 					<ul>
 						{
 							//if predictions is not empty, map through the predictions and display them
-							predictions.length > 0 &&
+							predictions &&
+								predictions.length > 0 &&
 								predictions.map((prediction, index) => (
 									<li key={index}>
 										{time[index]} :{Math.round(prediction)}
