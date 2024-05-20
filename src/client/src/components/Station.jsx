@@ -26,7 +26,7 @@ function Station({ station, onClose }) {
 			);
 			const data = await response.json();
 			console.log(data);
-			setPredictions(data.predictions);
+			setPredictions(data.prediction);
 			setIsLoading(false); // Set loading state to false once predictions are fetched
 		};
 		getPredictions();
