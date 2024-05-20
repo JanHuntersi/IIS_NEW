@@ -14,6 +14,9 @@ env:
    PROJECT_ID: iis
    SERVICE_ID: iis-api
    CREDENTIALS_ID: iis-registry
+   DVC_ACCESS_KEY_ID: ${{ secrets.DVC_ACCESS_KEY_ID }}
+   DVC_SECRET_ACCESS_KEY: ${{ secrets.DVC_SECRET_ACCESS_KEY }}
+
 
 jobs:
    build-and-deploy:
