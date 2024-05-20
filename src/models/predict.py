@@ -132,11 +132,13 @@ def predict_station(station_name,models_scalers_dict,windowsize=24):
     #stands_path = os.path.join(models_station_dir, f'{station_name}_scaler.pkl')
     #other_scaler_path = os.path.join(models_station_dir, f'{station_name}_production_other_scaler.pkl')
 
-    model =  ort.InferenceSession(models_scalers_dict["model"].SerializeToString())
+    model_scaler_station = models_scalers_dict[station_name]
+
+    model =  ort.InferenceSession(model_scaler_station["model"].SerializeToString())
     #stands_scaler = joblib.load(stands_path)
     #other_scaler = joblib.load(other_scaler_path) 
-    stands_scaler = models_scalers_dict["stands_scaler"]
-    other_scaler = models_scalers_dict["other_scaler"]
+    stands_scaler = model_scaler_station["stands_scaler"]
+    other_scaler = model_scaler_station["other_scaler"]
 
 
     processed_dataset_dir = os.path.join(current_dir, '..', '..', 'data', 'processed',f"{station_name}.csv")

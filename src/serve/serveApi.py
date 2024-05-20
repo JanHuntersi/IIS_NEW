@@ -56,10 +56,10 @@ def download_all_models():
 
         #save model and scalers
         make_dir_if_not_exist(os.path.join(models_dir, str(i)))
-        #joblib.dump(stands_scaler, os.path.join(models_dir, str(i), f'{i}_scaler.pkl'))
-        #joblib.dump(other_scaler, os.path.join(models_dir, str(i), f'{i}_production_other_scaler.pkl'))
-        #onnx.save_model(model, os.path.join(models_dir, str(i), f'{i}_production_model.onnx'))
-        #model.save_model(os.path.join(models_dir, str(i), f'{i}_production_model.onnx'))
+        joblib.dump(stands_scaler, os.path.join(models_dir, str(i), f'{i}_scaler.pkl'))
+        joblib.dump(other_scaler, os.path.join(models_dir, str(i), f'{i}_production_other_scaler.pkl'))
+        onnx.save_model(model, os.path.join(models_dir, str(i), f'{i}_production_model.onnx'))
+        model.save_model(os.path.join(models_dir, str(i), f'{i}_production_model.onnx'))
 
     print("All models downloaded")
     #print("models_scalers structure is:", models_scalers)
@@ -77,6 +77,7 @@ def get_all_stations():
 
 app = Flask(__name__)
 CORS(app)
+download_all_models()
 
 
 
@@ -104,7 +105,7 @@ def predict_station(station_id):
 
     print("Get call for station id:", station_id)
     
-    prediction = predict_logic.predict_station(station_id,models_scalers[station_id],windowsize=8)
+    prediction = predict_logic.predict_station(station_id,models_scalers,windowsize=8)
 
     prediction = [abs(x) for x in prediction]
     final_predictions = [max(0,round(x)) for x in prediction]
@@ -128,7 +129,6 @@ def root():
 
 #UNCOMMENT FOR IMAGE BUILD
 def main():
-    download_all_models()
     app.run(host='0.0.0.0', port=5000)
 
 if __name__ == '__main__':
