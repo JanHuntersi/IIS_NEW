@@ -50,11 +50,15 @@ function Station({ station, onClose }) {
 				<div>
 					<p>Napovedi:</p>
 					<ul>
-						{predictions.map((prediction, index) => (
-							<li key={index}>
-								{time[index]} :{Math.round(prediction)}
-							</li>
-						))}
+						{
+							//if predictions is not empty, map through the predictions and display them
+							predictions.length > 0 &&
+								predictions.map((prediction, index) => (
+									<li key={index}>
+										{time[index]} :{Math.round(prediction)}
+									</li>
+								))
+						}
 					</ul>
 				</div>
 			)}
