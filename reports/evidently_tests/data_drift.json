@@ -1,7 +1,7 @@
 {
-  "id": "944ed745-e362-44ac-a74c-ecb2c413c662",
+  "id": "3a1fa30f-1167-4f3f-8ced-cb049921101c",
   "name": null,
-  "timestamp": "2024-05-25T22:23:51.184197",
+  "timestamp": "2024-05-25T23:22:43.425365",
   "metadata": {
     "metric_presets": [
       "DataDriftPreset"
@@ -2624,7 +2624,7 @@
                     "146": 1.792439766426141,
                     "147": 1.7103892294525629,
                     "148": 2.190917072985527,
-                    "149": 1.2466002670665124
+                    "149": 1.2466002670665128
                   }
                 }
               },
@@ -12095,12 +12095,24 @@
     },
     "data_definition": {
       "columns": {
+        "relative_humidity_2m": {
+          "column_name": "relative_humidity_2m",
+          "column_type": "num"
+        },
         "precipitation_probability": {
           "column_name": "precipitation_probability",
           "column_type": "num"
         },
         "available_bike_stands": {
           "column_name": "available_bike_stands",
+          "column_type": "num"
+        },
+        "precipitation": {
+          "column_name": "precipitation",
+          "column_type": "num"
+        },
+        "available_bikes": {
+          "column_name": "available_bikes",
           "column_type": "num"
         },
         "apparent_temperature": {
@@ -12111,24 +12123,12 @@
           "column_name": "dew_point_2m",
           "column_type": "num"
         },
-        "precipitation": {
-          "column_name": "precipitation",
-          "column_type": "num"
-        },
-        "relative_humidity_2m": {
-          "column_name": "relative_humidity_2m",
-          "column_type": "num"
-        },
         "temperature_2m": {
           "column_name": "temperature_2m",
           "column_type": "num"
         },
         "surface_pressure": {
           "column_name": "surface_pressure",
-          "column_type": "num"
-        },
-        "available_bikes": {
-          "column_name": "available_bikes",
           "column_type": "num"
         },
         "number": {
