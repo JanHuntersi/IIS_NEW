@@ -1,7 +1,7 @@
 {
-  "id": "35476249-b81e-4042-966c-b3b242dfbb34",
+  "id": "0a2118b1-3f15-4668-98f7-8712a5a7bc9e",
   "name": null,
-  "timestamp": "2024-05-26T22:23:17.020963",
+  "timestamp": "2024-05-26T23:22:03.277224",
   "metadata": {
     "metric_presets": [
       "DataDriftPreset"
@@ -2624,7 +2624,7 @@
                     "146": 0.1955079990158975,
                     "147": 0.3591557996464757,
                     "148": 0.27010266185785714,
-                    "149": 0.6665491686610227
+                    "149": 0.6665491686610229
                   }
                 }
               },
@@ -12263,16 +12263,20 @@
     },
     "data_definition": {
       "columns": {
-        "temperature_2m": {
-          "column_name": "temperature_2m",
+        "relative_humidity_2m": {
+          "column_name": "relative_humidity_2m",
+          "column_type": "num"
+        },
+        "available_bikes": {
+          "column_name": "available_bikes",
+          "column_type": "num"
+        },
+        "apparent_temperature": {
+          "column_name": "apparent_temperature",
           "column_type": "num"
         },
         "precipitation_probability": {
           "column_name": "precipitation_probability",
-          "column_type": "num"
-        },
-        "dew_point_2m": {
-          "column_name": "dew_point_2m",
           "column_type": "num"
         },
         "surface_pressure": {
@@ -12283,20 +12287,16 @@
           "column_name": "available_bike_stands",
           "column_type": "num"
         },
-        "available_bikes": {
-          "column_name": "available_bikes",
-          "column_type": "num"
-        },
-        "relative_humidity_2m": {
-          "column_name": "relative_humidity_2m",
-          "column_type": "num"
-        },
         "precipitation": {
           "column_name": "precipitation",
           "column_type": "num"
         },
-        "apparent_temperature": {
-          "column_name": "apparent_temperature",
+        "temperature_2m": {
+          "column_name": "temperature_2m",
+          "column_type": "num"
+        },
+        "dew_point_2m": {
+          "column_name": "dew_point_2m",
           "column_type": "num"
         },
         "date": {
