@@ -1,4 +1,4 @@
-# IT-ARHITEKTURE
+# Mbajk availability tracker
 
 ## Project Structure
 
